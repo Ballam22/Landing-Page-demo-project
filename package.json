@@ -70,7 +70,7 @@
     "sass": "1.55.0",
     "sass-loader": "13.2.0",
     "typescript": "^5.3.3",
-    "vite": "^4.5.1",
+    "vite": "^5.4.21",
     "webpack": "5.105.4",
     "webpack-cli": "5.1.4",
     "webpack-rtl-plugin": "^2.0.0"
