@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Local AI/dev tools (may contain credentials)
+.opencode/
+.claude/
+.specify/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
