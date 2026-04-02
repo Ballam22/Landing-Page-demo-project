@@ -37,7 +37,9 @@ class ScrollTopComponent {
   }
 
   private _handlers = () => {
-    let timer: number
+    // `throttle` expects an optional timer id and assigns it on first call.
+    // Initialize as `undefined` so it's never "used before being assigned".
+    let timer: number | undefined
     window.addEventListener('scroll', () => {
       throttle(timer, () => {
         this._scroll()
