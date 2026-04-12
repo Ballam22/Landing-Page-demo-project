@@ -64,4 +64,47 @@ export interface UserModel {
   communication?: UserCommunicationModel
   address?: UserAddressModel
   socialNetworks?: UserSocialNetworksModel
+  emailVerified?: boolean
+}
+
+export type MockUser = {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  passwordHash: string
+  emailVerified: boolean
+  createdAt: number
+  lastLoginAt: number | null
+}
+
+export type LockoutRecord = {
+  count: number
+  resetAt: number
+}
+
+export type ResetToken = {
+  email: string
+  expiresAt: number
+  used: boolean
+}
+
+export type ResetRateLimit = {
+  count: number
+  windowStart: number
+}
+
+export type MockAuthError = {
+  type: 'lockout' | 'rate_limit' | 'invalid_token' | 'duplicate_email' | 'invalid_credentials'
+  message: string
+  resetAt?: number
+}
+
+export function isMockAuthError(error: unknown): error is MockAuthError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    typeof (error as MockAuthError).type === 'string'
+  )
 }

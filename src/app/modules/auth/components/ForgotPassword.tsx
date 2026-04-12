@@ -4,9 +4,11 @@ import clsx from 'clsx'
 import {Link} from 'react-router-dom'
 import {useFormik} from 'formik'
 import {requestPassword} from '../core/_requests'
+import {useIntl, FormattedMessage} from 'react-intl'
+import {isMockAuthError} from '../core/_models'
 
 const initialValues = {
-  email: 'admin@demo.com',
+  email: '',
 }
 
 const forgotPasswordSchema = Yup.object().shape({
@@ -18,27 +20,39 @@ const forgotPasswordSchema = Yup.object().shape({
 })
 
 export function ForgotPassword() {
+  const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [hasErrors, setHasErrors] = useState<boolean | undefined>(undefined)
+  const [rateLimited, setRateLimited] = useState(false)
+  const [demoToken, setDemoToken] = useState<string | undefined>(undefined)
+
   const formik = useFormik({
     initialValues,
     validationSchema: forgotPasswordSchema,
-    onSubmit: (values, {setStatus, setSubmitting}) => {
+    onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
       setHasErrors(undefined)
-      setTimeout(() => {
-        requestPassword(values.email)
-          .then(() => {
-            setHasErrors(false)
-            setLoading(false)
-          })
-          .catch(() => {
-            setHasErrors(true)
-            setLoading(false)
-            setSubmitting(false)
-            setStatus('The login detail is incorrect')
-          })
-      }, 1000)
+      setRateLimited(false)
+      setDemoToken(undefined)
+      try {
+        const {data} = await requestPassword(values.email)
+        setHasErrors(false)
+        if (data.token) {
+          setDemoToken(data.token)
+        }
+        setLoading(false)
+      } catch (error) {
+        console.error(error)
+        if (isMockAuthError(error) && error.type === 'rate_limit') {
+          setRateLimited(true)
+          setHasErrors(undefined)
+        } else {
+          setHasErrors(true)
+          setStatus(intl.formatMessage({id: 'AUTH.FORGOT.SUCCESS'}))
+        }
+        setLoading(false)
+        setSubmitting(false)
+      }
     },
   })
 
@@ -50,18 +64,22 @@ export function ForgotPassword() {
       onSubmit={formik.handleSubmit}
     >
       <div className='text-center mb-10'>
-        {/* begin::Title */}
-        <h1 className='text-gray-900 fw-bolder mb-3'>Forgot Password ?</h1>
-        {/* end::Title */}
-
-        {/* begin::Link */}
+        <h1 className='text-gray-900 fw-bolder mb-3'>
+          <FormattedMessage id='AUTH.FORGOT.TITLE' />
+        </h1>
         <div className='text-gray-500 fw-semibold fs-6'>
-          Enter your email to reset your password.
+          <FormattedMessage id='AUTH.FORGOT.DESCRIPTION' />
         </div>
-        {/* end::Link */}
       </div>
 
-      {/* begin::Title */}
+      {rateLimited && (
+        <div className='mb-lg-15 alert alert-warning'>
+          <div className='alert-text font-weight-bold'>
+            <FormattedMessage id='AUTH.RATE_LIMIT.MESSAGE' />
+          </div>
+        </div>
+      )}
+
       {hasErrors === true && (
         <div className='mb-lg-15 alert alert-danger'>
           <div className='alert-text font-weight-bold'>
@@ -72,25 +90,35 @@ export function ForgotPassword() {
 
       {hasErrors === false && (
         <div className='mb-10 bg-light-info p-8 rounded'>
-          <div className='text-info'>Sent password reset. Please check your email</div>
+          <div className='text-info'>
+            <FormattedMessage id='AUTH.FORGOT.SUCCESS' />
+          </div>
+          {demoToken && (
+            <div className='mt-3'>
+              <small className='text-muted'>
+                <FormattedMessage id='AUTH.RESET.DEMO_TOKEN_LABEL' />
+              </small>
+              <br />
+              <code className='text-break'>{demoToken}</code>
+            </div>
+          )}
         </div>
       )}
-      {/* end::Title */}
 
-      {/* begin::Form group */}
+      {/* begin::Form group Email */}
       <div className='fv-row mb-8'>
-        <label className='form-label fw-bolder text-gray-900 fs-6'>Email</label>
+        <label className='form-label fw-bolder text-gray-900 fs-6'>
+          <FormattedMessage id='AUTH.FORGOT.EMAIL_LABEL' />
+        </label>
         <input
           type='email'
-          placeholder=''
+          placeholder={intl.formatMessage({id: 'AUTH.FORGOT.EMAIL_LABEL'})}
           autoComplete='off'
           {...formik.getFieldProps('email')}
           className={clsx(
             'form-control bg-transparent',
             {'is-invalid': formik.touched.email && formik.errors.email},
-            {
-              'is-valid': formik.touched.email && !formik.errors.email,
-            }
+            {'is-valid': formik.touched.email && !formik.errors.email}
           )}
         />
         {formik.touched.email && formik.errors.email && (
@@ -106,7 +134,9 @@ export function ForgotPassword() {
       {/* begin::Form group */}
       <div className='d-flex flex-wrap justify-content-center pb-lg-0'>
         <button type='submit' id='kt_password_reset_submit' className='btn btn-primary me-4'>
-          <span className='indicator-label'>Submit</span>
+          <span className='indicator-label'>
+            <FormattedMessage id='AUTH.FORGOT.SUBMIT' />
+          </span>
           {loading && (
             <span className='indicator-progress'>
               Please wait...
@@ -121,9 +151,9 @@ export function ForgotPassword() {
             className='btn btn-light'
             disabled={formik.isSubmitting || !formik.isValid}
           >
-            Cancel
+            <FormattedMessage id='AUTH.FORGOT.CANCEL' />
           </button>
-        </Link>{' '}
+        </Link>
       </div>
       {/* end::Form group */}
     </form>

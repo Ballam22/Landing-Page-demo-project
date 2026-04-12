@@ -5,6 +5,7 @@ import {AuthModel, UserModel} from './_models'
 import * as authHelper from './AuthHelpers'
 import {getUserByToken} from './_requests'
 import {WithChildren} from '../../../../_metronic/helpers'
+import useSessionTimeout from './hooks/useSessionTimeout'
 
 type AuthContextProps = {
   auth: AuthModel | undefined
@@ -12,6 +13,8 @@ type AuthContextProps = {
   currentUser: UserModel | undefined
   setCurrentUser: Dispatch<SetStateAction<UserModel | undefined>>
   logout: () => void
+  emailVerificationDismissed: boolean
+  dismissEmailVerification: () => void
 }
 
 const initAuthContextPropsState = {
@@ -20,6 +23,8 @@ const initAuthContextPropsState = {
   currentUser: undefined,
   setCurrentUser: () => {},
   logout: () => {},
+  emailVerificationDismissed: false,
+  dismissEmailVerification: () => {},
 }
 
 const AuthContext = createContext<AuthContextProps>(initAuthContextPropsState)
@@ -31,10 +36,13 @@ const useAuth = () => {
 const AuthProvider: FC<WithChildren> = ({children}) => {
   const [auth, setAuth] = useState<AuthModel | undefined>(authHelper.getAuth())
   const [currentUser, setCurrentUser] = useState<UserModel | undefined>()
+  const [emailVerificationDismissed, setEmailVerificationDismissed] = useState(false)
+
   const saveAuth = (auth: AuthModel | undefined) => {
     setAuth(auth)
     if (auth) {
       authHelper.setAuth(auth)
+      setEmailVerificationDismissed(false)
     } else {
       authHelper.removeAuth()
     }
@@ -45,16 +53,24 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
     setCurrentUser(undefined)
   }
 
+  const dismissEmailVerification = () => {
+    setEmailVerificationDismissed(true)
+  }
+
   return (
-    <AuthContext.Provider value={{auth, saveAuth, currentUser, setCurrentUser, logout}}>
+    <AuthContext.Provider value={{auth, saveAuth, currentUser, setCurrentUser, logout, emailVerificationDismissed, dismissEmailVerification}}>
       {children}
     </AuthContext.Provider>
   )
 }
 
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000
+
 const AuthInit: FC<WithChildren> = ({children}) => {
   const {auth, currentUser, logout, setCurrentUser} = useAuth()
   const [showSplashScreen, setShowSplashScreen] = useState(true)
+
+  useSessionTimeout({timeoutMs: SESSION_TIMEOUT_MS, onTimeout: logout})
 
   // We should request user by authToken (IN OUR EXAMPLE IT'S API_TOKEN) before rendering the application
   useEffect(() => {

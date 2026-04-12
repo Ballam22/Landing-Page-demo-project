@@ -1,14 +1,13 @@
-
-
 import {useState, useEffect} from 'react'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
 import clsx from 'clsx'
 import {getUserByToken, register} from '../core/_requests'
 import {Link} from 'react-router-dom'
-import {toAbsoluteUrl} from '../../../../_metronic/helpers'
 import {PasswordMeterComponent} from '../../../../_metronic/assets/ts/components'
 import {useAuth} from '../core/Auth'
+import {useIntl, FormattedMessage} from 'react-intl'
+import {isMockAuthError} from '../core/_models'
 
 const initialValues = {
   firstname: '',
@@ -19,35 +18,39 @@ const initialValues = {
   acceptTerms: false,
 }
 
-const registrationSchema = Yup.object().shape({
-  firstname: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('First name is required'),
-  email: Yup.string()
-    .email('Wrong email format')
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Email is required'),
-  lastname: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Last name is required'),
-  password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Password is required'),
-  changepassword: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Password confirmation is required')
-    .oneOf([Yup.ref('password')], "Password and Confirm Password didn't match"),
-  acceptTerms: Yup.bool().required('You must accept the terms and conditions'),
-})
-
 export function Registration() {
+  const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const {saveAuth, setCurrentUser} = useAuth()
+
+  const registrationSchema = Yup.object().shape({
+    firstname: Yup.string()
+      .min(3, 'Minimum 3 symbols')
+      .max(50, 'Maximum 50 symbols')
+      .required('First name is required'),
+    email: Yup.string()
+      .email('Wrong email format')
+      .min(3, 'Minimum 3 symbols')
+      .max(50, 'Maximum 50 symbols')
+      .required('Email is required'),
+    lastname: Yup.string()
+      .min(3, 'Minimum 3 symbols')
+      .max(50, 'Maximum 50 symbols')
+      .required('Last name is required'),
+    password: Yup.string()
+      .min(8, 'Minimum 8 characters')
+      .max(50, 'Maximum 50 symbols')
+      .matches(/[a-zA-Z]/, 'Must contain at least one letter')
+      .matches(/[0-9]/, 'Must contain at least one number')
+      .required('Password is required'),
+    changepassword: Yup.string()
+      .min(8, 'Minimum 8 characters')
+      .max(50, 'Maximum 50 symbols')
+      .required('Password confirmation is required')
+      .oneOf([Yup.ref('password')], "Password and Confirm Password didn't match"),
+    acceptTerms: Yup.bool().required('You must accept the terms and conditions'),
+  })
+
   const formik = useFormik({
     initialValues,
     validationSchema: registrationSchema,
@@ -67,7 +70,11 @@ export function Registration() {
       } catch (error) {
         console.error(error)
         saveAuth(undefined)
-        setStatus('The registration details is incorrect')
+        if (isMockAuthError(error) && error.type === 'duplicate_email') {
+          setStatus(intl.formatMessage({id: 'AUTH.REGISTER.ERROR'}))
+        } else {
+          setStatus(intl.formatMessage({id: 'AUTH.REGISTER.ERROR'}))
+        }
         setSubmitting(false)
         setLoading(false)
       }
@@ -87,62 +94,11 @@ export function Registration() {
     >
       {/* begin::Heading */}
       <div className='text-center mb-11'>
-        {/* begin::Title */}
-        <h1 className='text-gray-900 fw-bolder mb-3'>Sign Up</h1>
-        {/* end::Title */}
-
-        <div className='text-gray-500 fw-semibold fs-6'>Your Social Campaigns</div>
+        <h1 className='text-gray-900 fw-bolder mb-3'>
+          <FormattedMessage id='AUTH.REGISTER.TITLE' />
+        </h1>
       </div>
       {/* end::Heading */}
-
-      {/* begin::Login options */}
-      <div className='row g-3 mb-9'>
-        {/* begin::Col */}
-        <div className='col-md-6'>
-          {/* begin::Google link */}
-          <a
-            href='#'
-            className='btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100'
-          >
-            <img
-              alt='Logo'
-              src={toAbsoluteUrl('media/svg/brand-logos/google-icon.svg')}
-              className='h-15px me-3'
-            />
-            Sign in with Google
-          </a>
-          {/* end::Google link */}
-        </div>
-        {/* end::Col */}
-
-        {/* begin::Col */}
-        <div className='col-md-6'>
-          {/* begin::Google link */}
-          <a
-            href='#'
-            className='btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100'
-          >
-            <img
-              alt='Logo'
-              src={toAbsoluteUrl('media/svg/brand-logos/apple-black.svg')}
-              className='theme-light-show h-15px me-3'
-            />
-            <img
-              alt='Logo'
-              src={toAbsoluteUrl('media/svg/brand-logos/apple-black-dark.svg')}
-              className='theme-dark-show h-15px me-3'
-            />
-            Sign in with Apple
-          </a>
-          {/* end::Google link */}
-        </div>
-        {/* end::Col */}
-      </div>
-      {/* end::Login options */}
-
-      <div className='separator separator-content my-14'>
-        <span className='w-125px text-gray-500 fw-semibold fs-7'>Or with email</span>
-      </div>
 
       {formik.status && (
         <div className='mb-lg-15 alert alert-danger'>
@@ -152,20 +108,18 @@ export function Registration() {
 
       {/* begin::Form group Firstname */}
       <div className='fv-row mb-8'>
-        <label className='form-label fw-bolder text-gray-900 fs-6'>First name</label>
+        <label className='form-label fw-bolder text-gray-900 fs-6'>
+          <FormattedMessage id='AUTH.REGISTER.FIRSTNAME_LABEL' />
+        </label>
         <input
-          placeholder='First name'
+          placeholder={intl.formatMessage({id: 'AUTH.REGISTER.FIRSTNAME_LABEL'})}
           type='text'
           autoComplete='off'
           {...formik.getFieldProps('firstname')}
           className={clsx(
             'form-control bg-transparent',
-            {
-              'is-invalid': formik.touched.firstname && formik.errors.firstname,
-            },
-            {
-              'is-valid': formik.touched.firstname && !formik.errors.firstname,
-            }
+            {'is-invalid': formik.touched.firstname && formik.errors.firstname},
+            {'is-valid': formik.touched.firstname && !formik.errors.firstname}
           )}
         />
         {formik.touched.firstname && formik.errors.firstname && (
@@ -177,22 +131,21 @@ export function Registration() {
         )}
       </div>
       {/* end::Form group */}
+
       <div className='fv-row mb-8'>
         {/* begin::Form group Lastname */}
-        <label className='form-label fw-bolder text-gray-900 fs-6'>Last name</label>
+        <label className='form-label fw-bolder text-gray-900 fs-6'>
+          <FormattedMessage id='AUTH.REGISTER.LASTNAME_LABEL' />
+        </label>
         <input
-          placeholder='Last name'
+          placeholder={intl.formatMessage({id: 'AUTH.REGISTER.LASTNAME_LABEL'})}
           type='text'
           autoComplete='off'
           {...formik.getFieldProps('lastname')}
           className={clsx(
             'form-control bg-transparent',
-            {
-              'is-invalid': formik.touched.lastname && formik.errors.lastname,
-            },
-            {
-              'is-valid': formik.touched.lastname && !formik.errors.lastname,
-            }
+            {'is-invalid': formik.touched.lastname && formik.errors.lastname},
+            {'is-valid': formik.touched.lastname && !formik.errors.lastname}
           )}
         />
         {formik.touched.lastname && formik.errors.lastname && (
@@ -207,18 +160,18 @@ export function Registration() {
 
       {/* begin::Form group Email */}
       <div className='fv-row mb-8'>
-        <label className='form-label fw-bolder text-gray-900 fs-6'>Email</label>
+        <label className='form-label fw-bolder text-gray-900 fs-6'>
+          <FormattedMessage id='AUTH.REGISTER.EMAIL_LABEL' />
+        </label>
         <input
-          placeholder='Email'
+          placeholder={intl.formatMessage({id: 'AUTH.REGISTER.EMAIL_LABEL'})}
           type='email'
           autoComplete='off'
           {...formik.getFieldProps('email')}
           className={clsx(
             'form-control bg-transparent',
             {'is-invalid': formik.touched.email && formik.errors.email},
-            {
-              'is-valid': formik.touched.email && !formik.errors.email,
-            }
+            {'is-valid': formik.touched.email && !formik.errors.email}
           )}
         />
         {formik.touched.email && formik.errors.email && (
@@ -234,21 +187,19 @@ export function Registration() {
       {/* begin::Form group Password */}
       <div className='fv-row mb-8' data-kt-password-meter='true'>
         <div className='mb-1'>
-          <label className='form-label fw-bolder text-gray-900 fs-6'>Password</label>
+          <label className='form-label fw-bolder text-gray-900 fs-6'>
+            <FormattedMessage id='AUTH.REGISTER.PASSWORD_LABEL' />
+          </label>
           <div className='position-relative mb-3'>
             <input
               type='password'
-              placeholder='Password'
+              placeholder={intl.formatMessage({id: 'AUTH.REGISTER.PASSWORD_LABEL'})}
               autoComplete='off'
               {...formik.getFieldProps('password')}
               className={clsx(
                 'form-control bg-transparent',
-                {
-                  'is-invalid': formik.touched.password && formik.errors.password,
-                },
-                {
-                  'is-valid': formik.touched.password && !formik.errors.password,
-                }
+                {'is-invalid': formik.touched.password && formik.errors.password},
+                {'is-valid': formik.touched.password && !formik.errors.password}
               )}
             />
             {formik.touched.password && formik.errors.password && (
@@ -272,27 +223,25 @@ export function Registration() {
           {/* end::Meter */}
         </div>
         <div className='text-muted'>
-          Use 8 or more characters with a mix of letters, numbers & symbols.
+          <FormattedMessage id='AUTH.REGISTER.PASSWORD_HINT' />
         </div>
       </div>
       {/* end::Form group */}
 
       {/* begin::Form group Confirm password */}
       <div className='fv-row mb-5'>
-        <label className='form-label fw-bolder text-gray-900 fs-6'>Confirm Password</label>
+        <label className='form-label fw-bolder text-gray-900 fs-6'>
+          <FormattedMessage id='AUTH.REGISTER.CONFIRM_PASSWORD_LABEL' />
+        </label>
         <input
           type='password'
-          placeholder='Password confirmation'
+          placeholder={intl.formatMessage({id: 'AUTH.REGISTER.CONFIRM_PASSWORD_LABEL'})}
           autoComplete='off'
           {...formik.getFieldProps('changepassword')}
           className={clsx(
             'form-control bg-transparent',
-            {
-              'is-invalid': formik.touched.changepassword && formik.errors.changepassword,
-            },
-            {
-              'is-valid': formik.touched.changepassword && !formik.errors.changepassword,
-            }
+            {'is-invalid': formik.touched.changepassword && formik.errors.changepassword},
+            {'is-valid': formik.touched.changepassword && !formik.errors.changepassword}
           )}
         />
         {formik.touched.changepassword && formik.errors.changepassword && (
@@ -305,7 +254,7 @@ export function Registration() {
       </div>
       {/* end::Form group */}
 
-      {/* begin::Form group */}
+      {/* begin::Form group - Accept Terms */}
       <div className='fv-row mb-8'>
         <label className='form-check form-check-inline' htmlFor='kt_login_toc_agree'>
           <input
@@ -315,13 +264,13 @@ export function Registration() {
             {...formik.getFieldProps('acceptTerms')}
           />
           <span>
-            I Accept the{' '}
+            <FormattedMessage id='AUTH.REGISTER.ACCEPT_TERMS' />{' '}
             <a
               href='https://keenthemes.com/metronic/?page=faq'
               target='_blank'
               className='ms-1 link-primary'
             >
-              Terms
+              <FormattedMessage id='AUTH.REGISTER.TERMS_LINK' />
             </a>
             .
           </span>
@@ -344,7 +293,11 @@ export function Registration() {
           className='btn btn-lg btn-primary w-100 mb-5'
           disabled={formik.isSubmitting || !formik.isValid || !formik.values.acceptTerms}
         >
-          {!loading && <span className='indicator-label'>Submit</span>}
+          {!loading && (
+            <span className='indicator-label'>
+              <FormattedMessage id='AUTH.REGISTER.SUBMIT' />
+            </span>
+          )}
           {loading && (
             <span className='indicator-progress' style={{display: 'block'}}>
               Please wait...{' '}
@@ -358,11 +311,20 @@ export function Registration() {
             id='kt_login_signup_form_cancel_button'
             className='btn btn-lg btn-light-primary w-100 mb-5'
           >
-            Cancel
+            <FormattedMessage id='AUTH.REGISTER.CANCEL' />
           </button>
         </Link>
       </div>
       {/* end::Form group */}
+
+      {/* begin::Sign in link */}
+      <div className='text-gray-500 text-center fw-semibold fs-6'>
+        <FormattedMessage id='AUTH.REGISTER.HAVE_ACCOUNT' />{' '}
+        <Link to='/auth/login' className='link-primary fw-semibold'>
+          <FormattedMessage id='AUTH.REGISTER.SIGN_IN_LINK' />
+        </Link>
+      </div>
+      {/* end::Sign in link */}
     </form>
   )
 }
