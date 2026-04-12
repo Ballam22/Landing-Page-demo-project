@@ -1,10 +1,18 @@
 import {lazy, FC, Suspense} from 'react'
-import {Route, Routes, Navigate} from 'react-router-dom'
+import {Route, Routes, Navigate, Outlet} from 'react-router-dom'
 import {MasterLayout} from '../../_metronic/layout/MasterLayout'
 import TopBarProgress from 'react-topbar-progress-indicator'
 import {DashboardWrapper} from '../pages/dashboard/DashboardWrapper'
 import {getCSSVariableValue} from '../../_metronic/assets/ts/_utils'
 import {WithChildren} from '../../_metronic/helpers'
+import {EmailVerificationBanner} from '../modules/auth/components/EmailVerificationBanner'
+
+const BannerLayout = () => (
+  <>
+    <EmailVerificationBanner />
+    <Outlet />
+  </>
+)
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
@@ -12,17 +20,19 @@ const PrivateRoutes = () => {
   return (
     <Routes>
       <Route element={<MasterLayout />}>
-        <Route path='auth/*' element={<Navigate to='/dashboard' />} />
-        <Route path='dashboard' element={<DashboardWrapper />} />
-        <Route
-          path='profile/*'
-          element={
-            <SuspensedView>
-              <ProfilePage />
-            </SuspensedView>
-          }
-        />
-        <Route path='*' element={<Navigate to='/error/404' />} />
+        <Route element={<BannerLayout />}>
+          <Route path='auth/*' element={<Navigate to='/dashboard' />} />
+          <Route path='dashboard' element={<DashboardWrapper />} />
+          <Route
+            path='profile/*'
+            element={
+              <SuspensedView>
+                <ProfilePage />
+              </SuspensedView>
+            }
+          />
+          <Route path='*' element={<Navigate to='/error/404' />} />
+        </Route>
       </Route>
     </Routes>
   )
