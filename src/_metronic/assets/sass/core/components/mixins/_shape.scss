@@ -12,7 +12,13 @@
 	$points: ();
 
 	@for $i from 0 to $edges-number {
-		$vertex-angle: $i * $central-angle + if($rotated, -90deg, 0deg);
+		$rotation-offset: 0deg;
+
+		@if $rotated {
+			$rotation-offset: -90deg;
+		}
+
+		$vertex-angle: $i * $central-angle + $rotation-offset;
 		$vertex-x: 50% + $r-diff * math.cos($vertex-angle);
 		$vertex-y: 50% + $r-diff * math.sin($vertex-angle);
 
