@@ -16,6 +16,7 @@ const BannerLayout = () => (
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
+  const UserManagementPage = lazy(() => import('../modules/user-management/UserManagementPage'))
 
   return (
     <Routes>
@@ -28,6 +29,14 @@ const PrivateRoutes = () => {
             element={
               <SuspensedView>
                 <ProfilePage />
+              </SuspensedView>
+            }
+          />
+          <Route
+            path='user-management'
+            element={
+              <SuspensedView>
+                <UserManagementPage />
               </SuspensedView>
             }
           />

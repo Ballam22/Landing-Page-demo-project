@@ -5,7 +5,7 @@ import {WithChildren} from '../helpers'
 const I18N_CONFIG_KEY = import.meta.env.VITE_APP_I18N_CONFIG_KEY || 'i18nConfig'
 
 type Props = {
-  selectedLang: 'de' | 'en' | 'es' | 'fr' | 'ja' | 'zh'
+  selectedLang: 'en'
 }
 const initialState: Props = {
   selectedLang: 'en',
@@ -15,18 +15,18 @@ function getConfig(): Props {
   const ls = localStorage.getItem(I18N_CONFIG_KEY)
   if (ls) {
     try {
-      return JSON.parse(ls) as Props
+      const parsed = JSON.parse(ls) as Partial<Props>
+
+      if (parsed.selectedLang === 'en') {
+        return initialState
+      }
     } catch (er) {
       console.error(er)
     }
   }
-  return initialState
-}
 
-// Side effect
-export function setLanguage(lang: string) {
-  localStorage.setItem(I18N_CONFIG_KEY, JSON.stringify({selectedLang: lang}))
-  window.location.reload()
+  localStorage.setItem(I18N_CONFIG_KEY, JSON.stringify(initialState))
+  return initialState
 }
 
 const I18nContext = createContext<Props>(initialState)

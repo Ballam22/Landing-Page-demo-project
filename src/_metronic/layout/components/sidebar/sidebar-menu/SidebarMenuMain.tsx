@@ -13,6 +13,12 @@ const SidebarMenuMain = () => {
         title={intl.formatMessage({id: 'MENU.DASHBOARD'})}
         fontIcon='bi-app-indicator'
       />
+      <SidebarMenuItem
+        to='/user-management'
+        icon='profile-user'
+        title={intl.formatMessage({id: 'USER_MANAGEMENT.TITLE'})}
+        fontIcon='bi-people'
+      />
       <SidebarMenuItemWithSub to='/profile' title='Profile' fontIcon='bi-person' icon='profile-circle'>
         <SidebarMenuItem to='/profile/overview' title='Overview' hasBullet={true} />
         <SidebarMenuItem to='/profile/projects' title='Projects' hasBullet={true} />
