@@ -154,50 +154,6 @@ const ProfileHeader: FC = () => {
                     Overview
                   </Link>
                 </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/projects' && 'active')
-                    }
-                    to='/profile/projects'
-                  >
-                    Projects
-                  </Link>
-                </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/campaigns' && 'active')
-                    }
-                    to='/profile/campaigns'
-                  >
-                    Campaigns
-                  </Link>
-                </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/documents' && 'active')
-                    }
-                    to='/profile/documents'
-                  >
-                    Documents
-                  </Link>
-                </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/connections' && 'active')
-                    }
-                    to='/profile/connections'
-                  >
-                    Connections
-                  </Link>
-                </li>
               </ul>
             </div>
           </div>

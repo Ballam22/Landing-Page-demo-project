@@ -19,13 +19,12 @@ const SidebarMenuMain = () => {
         title={intl.formatMessage({id: 'USER_MANAGEMENT.TITLE'})}
         fontIcon='bi-people'
       />
-      <SidebarMenuItemWithSub to='/profile' title='Profile' fontIcon='bi-person' icon='profile-circle'>
-        <SidebarMenuItem to='/profile/overview' title='Overview' hasBullet={true} />
-        <SidebarMenuItem to='/profile/projects' title='Projects' hasBullet={true} />
-        <SidebarMenuItem to='/profile/campaigns' title='Campaigns' hasBullet={true} />
-        <SidebarMenuItem to='/profile/documents' title='Documents' hasBullet={true} />
-        <SidebarMenuItem to='/profile/connections' title='Connections' hasBullet={true} />
-      </SidebarMenuItemWithSub>
+      <SidebarMenuItem
+        to='/profile/overview'
+        icon='profile-circle'
+        title='Profile'
+        fontIcon='bi-person'
+      />
     </>
   )
 }
