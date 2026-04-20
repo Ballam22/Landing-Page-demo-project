@@ -1,12 +1,12 @@
 import clsx from 'clsx'
-import {KTIcon, toAbsoluteUrl} from '../../../helpers'
+import {KTIcon} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
+import {UserAvatarButton} from '../../../../app/components/UserAvatarButton'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
   'btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px'
-const userAvatarClass = 'symbol-35px'
 const btnIconClass = 'fs-2'
 
 const Navbar = () => {
@@ -48,12 +48,12 @@ const Navbar = () => {
 
       <div className={clsx('app-navbar-item', itemClass)}>
         <div
-          className={clsx('cursor-pointer symbol', userAvatarClass)}
+          className='cursor-pointer'
           data-kt-menu-trigger="{default: 'click'}"
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
         >
-          <img src={toAbsoluteUrl('media/avatars/300-3.jpg')} alt='' />
+          <UserAvatarButton />
         </div>
         <HeaderUserMenu />
       </div>

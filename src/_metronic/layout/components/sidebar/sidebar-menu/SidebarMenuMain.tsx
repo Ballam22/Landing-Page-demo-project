@@ -1,5 +1,4 @@
 import {useIntl} from 'react-intl'
-import {SidebarMenuItemWithSub} from './SidebarMenuItemWithSub'
 import {SidebarMenuItem} from './SidebarMenuItem'
 
 const SidebarMenuMain = () => {
@@ -22,7 +21,7 @@ const SidebarMenuMain = () => {
       <SidebarMenuItem
         to='/profile/overview'
         icon='profile-circle'
-        title='Profile'
+        title={intl.formatMessage({id: 'MENU.PROFILE'})}
         fontIcon='bi-person'
       />
     </>

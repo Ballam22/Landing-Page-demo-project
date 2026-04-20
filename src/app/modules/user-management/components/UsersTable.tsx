@@ -2,17 +2,18 @@ import {FC, useMemo} from 'react'
 import {useTable, Column, Row, ColumnInstance} from 'react-table'
 import {useIntl} from 'react-intl'
 import {User} from '../_models'
-import {useUserManagement} from '../hooks/useUserManagement'
+import {useUserList} from '../hooks/useUsers'
 import {RoleBadge} from './RoleBadge'
 
 type Props = {
+  currentUserId: string | null
   onEdit: (user: User) => void
   onDelete: (user: User) => void
 }
 
-const UsersTable: FC<Props> = ({onEdit, onDelete}) => {
+const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
   const intl = useIntl()
-  const {users} = useUserManagement()
+  const {data: users = [], isLoading, isError} = useUserList()
 
   const columns: Column<User>[] = useMemo(
     () => [
@@ -25,7 +26,11 @@ const UsersTable: FC<Props> = ({onEdit, onDelete}) => {
             return (
               <div className='symbol symbol-circle symbol-45px overflow-hidden'>
                 <div className='symbol-label'>
-                  <img src={avatarUrl} alt={fullName} className='w-100' />
+                  <img
+                    src={`${avatarUrl}?t=${Date.now()}`}
+                    alt={fullName}
+                    className='w-100'
+                  />
                 </div>
               </div>
             )
@@ -80,38 +85,43 @@ const UsersTable: FC<Props> = ({onEdit, onDelete}) => {
       {
         Header: intl.formatMessage({id: 'USER_MANAGEMENT.COL_ACTIONS'}),
         id: 'actions',
-        Cell: ({row}: {row: Row<User>}) => (
-          <div className='d-flex gap-2'>
-            <button
-              type='button'
-              className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm'
-              title={intl.formatMessage({id: 'USER_MANAGEMENT.EDIT_USER'})}
-              onClick={() => onEdit(row.original)}
-            >
-              <i className='ki-duotone ki-pencil fs-4'>
-                <span className='path1'></span>
-                <span className='path2'></span>
-              </i>
-            </button>
-            <button
-              type='button'
-              className='btn btn-icon btn-bg-light btn-active-color-danger btn-sm'
-              title={intl.formatMessage({id: 'USER_MANAGEMENT.DELETE_USER'})}
-              onClick={() => onDelete(row.original)}
-            >
-              <i className='ki-duotone ki-trash fs-4'>
-                <span className='path1'></span>
-                <span className='path2'></span>
-                <span className='path3'></span>
-                <span className='path4'></span>
-                <span className='path5'></span>
-              </i>
-            </button>
-          </div>
-        ),
+        Cell: ({row}: {row: Row<User>}) => {
+          const isOwnRow = row.original.id === currentUserId
+          return (
+            <div className='d-flex gap-2'>
+              <button
+                type='button'
+                className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm'
+                title={intl.formatMessage({id: 'USER_MANAGEMENT.EDIT_USER'})}
+                onClick={() => onEdit(row.original)}
+              >
+                <i className='ki-duotone ki-pencil fs-4'>
+                  <span className='path1'></span>
+                  <span className='path2'></span>
+                </i>
+              </button>
+              <button
+                type='button'
+                className='btn btn-icon btn-bg-light btn-active-color-danger btn-sm'
+                title={intl.formatMessage({id: 'USER_MANAGEMENT.DELETE_USER'})}
+                onClick={() => onDelete(row.original)}
+                disabled={isOwnRow}
+                style={isOwnRow ? {opacity: 0.4, cursor: 'not-allowed'} : undefined}
+              >
+                <i className='ki-duotone ki-trash fs-4'>
+                  <span className='path1'></span>
+                  <span className='path2'></span>
+                  <span className='path3'></span>
+                  <span className='path4'></span>
+                  <span className='path5'></span>
+                </i>
+              </button>
+            </div>
+          )
+        },
       },
     ],
-    [intl, onEdit, onDelete]
+    [intl, currentUserId, onEdit, onDelete]
   )
 
   const data = useMemo(() => users, [users])
@@ -120,6 +130,24 @@ const UsersTable: FC<Props> = ({onEdit, onDelete}) => {
     columns,
     data,
   })
+
+  if (isLoading) {
+    return (
+      <div className='d-flex justify-content-center py-10'>
+        <span className='spinner-border text-primary' role='status'>
+          <span className='visually-hidden'>Loading...</span>
+        </span>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className='alert alert-danger mx-4 my-4'>
+        {intl.formatMessage({id: 'USER_MANAGEMENT.LOAD_ERROR'})}
+      </div>
+    )
+  }
 
   return (
     <div className='table-responsive'>
@@ -157,7 +185,6 @@ const UsersTable: FC<Props> = ({onEdit, onDelete}) => {
                 </tr>
               )
             })
-
           ) : (
             <tr>
               <td colSpan={6}>

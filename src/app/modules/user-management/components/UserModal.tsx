@@ -1,8 +1,8 @@
 import {FC, useEffect} from 'react'
 import {useIntl} from 'react-intl'
-import {User, UserFormValues} from '../_models'
+import {UserFormValues} from '../_models'
 import {UserModalForm} from './UserModalForm'
-import {useUserManagement} from '../hooks/useUserManagement'
+import {useUserList} from '../hooks/useUsers'
 
 type Props = {
   isOpen: boolean
@@ -14,7 +14,7 @@ type Props = {
 
 const UserModal: FC<Props> = ({isOpen, onClose, initialValues, mode, userId}) => {
   const intl = useIntl()
-  const {users} = useUserManagement()
+  const {data: users = []} = useUserList()
 
   useEffect(() => {
     if (isOpen) {
@@ -28,8 +28,8 @@ const UserModal: FC<Props> = ({isOpen, onClose, initialValues, mode, userId}) =>
   if (!isOpen) return null
 
   const existingEmails = users
-    .filter((u: User) => u.id !== userId)
-    .map((u: User) => u.email)
+    .filter((u) => u.id !== userId)
+    .map((u) => u.email)
 
   const title =
     mode === 'add'
@@ -47,7 +47,6 @@ const UserModal: FC<Props> = ({isOpen, onClose, initialValues, mode, userId}) =>
       >
         <div className='modal-dialog modal-dialog-centered mw-650px'>
           <div className='modal-content'>
-            {/* Header */}
             <div className='modal-header' id='kt_modal_user_header'>
               <h2 className='fw-bolder'>{title}</h2>
               <button
@@ -62,7 +61,6 @@ const UserModal: FC<Props> = ({isOpen, onClose, initialValues, mode, userId}) =>
                 </i>
               </button>
             </div>
-            {/* Body */}
             <div className='modal-body py-7'>
               <UserModalForm
                 mode={mode}

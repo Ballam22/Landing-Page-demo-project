@@ -1,41 +1,54 @@
-import {createContext, FC, ReactNode, useState} from 'react'
-import {MOCK_USERS} from './_mockData'
+import {createContext, FC, ReactNode, useEffect, useState} from 'react'
+import {supabase} from '../../lib/supabaseClient'
+import {useAuth} from '../auth'
 import {User} from './_models'
+import {useAddUser, useRemoveUser, useUpdateUser} from './hooks/useUsers'
 
 type UserManagementContextType = {
-  users: User[]
-  addUser: (data: Omit<User, 'id'>) => void
-  updateUser: (id: string, data: Partial<Omit<User, 'id'>>) => void
-  deleteUser: (id: string) => void
+  currentUserId: string | null
+  addUser: (payload: Omit<User, 'id'>, avatarFile?: File) => Promise<User>
+  updateUser: (id: string, payload: Partial<Omit<User, 'id'>>, avatarFile?: File) => Promise<User>
+  deleteUser: (id: string) => Promise<void>
 }
 
 const UserManagementContext = createContext<UserManagementContextType | undefined>(undefined)
 
-type Props = {
-  children: ReactNode
-}
+type Props = {children: ReactNode}
 
 const UserManagementProvider: FC<Props> = ({children}) => {
-  const [users, setUsers] = useState<User[]>(MOCK_USERS)
+  const {currentUser} = useAuth()
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
-  const addUser = (data: Omit<User, 'id'>) => {
-    const newUser: User = {
-      ...data,
-      id: crypto.randomUUID(),
-    }
-    setUsers((prev) => [...prev, newUser])
-  }
+  useEffect(() => {
+    const email = currentUser?.email
+    if (!email) return
+    supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single()
+      .then(({data}) => {
+        setCurrentUserId(data?.id ?? null)
+      })
+  }, [currentUser?.email])
 
-  const updateUser = (id: string, data: Partial<Omit<User, 'id'>>) => {
-    setUsers((prev) => prev.map((u) => (u.id === id ? {...u, ...data} : u)))
-  }
+  const addMutation = useAddUser()
+  const updateMutation = useUpdateUser()
+  const removeMutation = useRemoveUser()
 
-  const deleteUser = (id: string) => {
-    setUsers((prev) => prev.filter((u) => u.id !== id))
-  }
+  const addUser = (payload: Omit<User, 'id'>, avatarFile?: File) =>
+    addMutation.mutateAsync({payload, avatarFile})
+
+  const updateUser = (
+    id: string,
+    payload: Partial<Omit<User, 'id'>>,
+    avatarFile?: File
+  ) => updateMutation.mutateAsync({id, payload, avatarFile})
+
+  const deleteUser = (id: string) => removeMutation.mutateAsync(id)
 
   return (
-    <UserManagementContext.Provider value={{users, addUser, updateUser, deleteUser}}>
+    <UserManagementContext.Provider value={{currentUserId, addUser, updateUser, deleteUser}}>
       {children}
     </UserManagementContext.Provider>
   )

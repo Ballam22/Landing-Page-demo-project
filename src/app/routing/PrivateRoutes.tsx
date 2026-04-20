@@ -6,6 +6,7 @@ import {DashboardWrapper} from '../pages/dashboard/DashboardWrapper'
 import {getCSSVariableValue} from '../../_metronic/assets/ts/_utils'
 import {WithChildren} from '../../_metronic/helpers'
 import {EmailVerificationBanner} from '../modules/auth/components/EmailVerificationBanner'
+import {RoleGuard} from '../modules/user-management/components/guards/RoleGuard'
 
 const BannerLayout = () => (
   <>
@@ -36,7 +37,9 @@ const PrivateRoutes = () => {
             path='user-management'
             element={
               <SuspensedView>
-                <UserManagementPage />
+                <RoleGuard allowedRoles={['Admin', 'Manager']}>
+                  <UserManagementPage />
+                </RoleGuard>
               </SuspensedView>
             }
           />

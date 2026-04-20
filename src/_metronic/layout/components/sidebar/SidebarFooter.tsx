@@ -1,21 +1,18 @@
-
 import {KTIcon} from '../../../helpers'
+import {useAuth} from '../../../../app/modules/auth'
 
 const SidebarFooter = () => {
+  const {logout} = useAuth()
+
   return (
     <div className='app-sidebar-footer flex-column-auto pt-2 pb-6 px-6' id='kt_app_sidebar_footer'>
-      <a
-        href={import.meta.env.VITE_APP_PREVIEW_DOCS_URL}
-        target='_blank'
-        className='btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100'
-        data-bs-toggle='tooltip'
-        data-bs-trigger='hover'
-        data-bs-dismiss-='click'
-        title='Metronic Docs & Components'
+      <button
+        onClick={logout}
+        className='btn btn-flex flex-center btn-custom btn-light-danger overflow-hidden text-nowrap px-0 h-40px w-100'
       >
-        <span className='btn-label'>Docs & Components</span>
-        <KTIcon iconName='document' className='btn-icon fs-2 m-0' />
-      </a>
+        <span className='btn-label'>Sign Out</span>
+        <KTIcon iconName='exit-right' className='btn-icon fs-2 m-0' />
+      </button>
     </div>
   )
 }

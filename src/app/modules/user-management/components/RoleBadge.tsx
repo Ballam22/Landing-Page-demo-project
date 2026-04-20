@@ -3,9 +3,9 @@ import {useIntl} from 'react-intl'
 import {Role} from '../_models'
 
 const badgeClassMap: Record<Role, string> = {
-  Admin: 'badge badge-light-danger',
-  Manager: 'badge badge-light-warning',
-  User: 'badge badge-light-primary',
+  Admin: 'badge badge-light-primary',
+  Manager: 'badge badge-light-success',
+  User: 'badge badge-light-secondary',
 }
 
 const roleIntlKeyMap: Record<Role, string> = {
