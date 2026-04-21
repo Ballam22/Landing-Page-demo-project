@@ -3,6 +3,9 @@ import {KTIcon} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
 import {UserAvatarButton} from '../../../../app/components/UserAvatarButton'
+import {useAuth} from '../../../../app/modules/auth'
+import {useCurrentProfile} from '../../../../app/hooks/useCurrentProfile'
+import {useUnreadMessageCount} from '../../../../app/modules/messages/hooks/useMessages'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
@@ -11,6 +14,10 @@ const btnIconClass = 'fs-2'
 
 const Navbar = () => {
   const {config} = useLayout()
+  const {currentUser} = useAuth()
+  const {data: profile} = useCurrentProfile(currentUser?.email)
+  const {data: unreadCount = 0} = useUnreadMessageCount(profile?.id)
+
   return (
     <div className='app-navbar flex-shrink-0'>
       <div className={clsx('app-navbar-item align-items-stretch', itemClass)}>
@@ -38,6 +45,11 @@ const Navbar = () => {
       <div className={clsx('app-navbar-item', itemClass)}>
         <div className={clsx('position-relative', btnClass)} id='kt_drawer_chat_toggle'>
           <KTIcon iconName='message-text-2' className={btnIconClass} />
+          {unreadCount > 0 && (
+            <span className='badge badge-circle badge-danger position-absolute top-0 start-100 translate-middle fs-8'>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </div>
       </div>
 

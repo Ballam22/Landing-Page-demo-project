@@ -1,11 +1,12 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {Link, useNavigate, useSearchParams} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {useFormik} from 'formik'
 import {resetPassword} from '../core/_requests'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {isMockAuthError} from '../core/_models'
+import {isAuthFlowError} from '../core/_models'
+import {supabase} from '../../../lib/supabaseClient'
 
 const initialValues = {
   newPassword: '',
@@ -15,9 +16,8 @@ const initialValues = {
 export function ResetPassword() {
   const intl = useIntl()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token') ?? ''
   const [loading, setLoading] = useState(false)
+  const [sessionReady, setSessionReady] = useState(false)
   const [tokenError, setTokenError] = useState(false)
 
   const resetPasswordSchema = Yup.object().shape({
@@ -39,11 +39,11 @@ export function ResetPassword() {
       setLoading(true)
       setTokenError(false)
       try {
-        await resetPassword(token, values.newPassword)
+        await resetPassword(values.newPassword)
         navigate('/auth/login?reset=success', {replace: true})
       } catch (error) {
         console.error(error)
-        if (isMockAuthError(error) && error.type === 'invalid_token') {
+        if (isAuthFlowError(error) && error.type === 'invalid_recovery_session') {
           setTokenError(true)
         }
         setSubmitting(false)
@@ -51,6 +51,41 @@ export function ResetPassword() {
       }
     },
   })
+
+  useEffect(() => {
+    let isMounted = true
+
+    const syncSessionState = async () => {
+      const {data} = await supabase.auth.getSession()
+
+      if (!isMounted) {
+        return
+      }
+
+      setSessionReady(true)
+      setTokenError(!data.session)
+    }
+
+    void syncSessionState()
+
+    const {
+      data: {subscription},
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) {
+        return
+      }
+
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setSessionReady(true)
+        setTokenError(!session)
+      }
+    })
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [])
 
   return (
     <form
@@ -136,7 +171,7 @@ export function ResetPassword() {
           type='submit'
           id='kt_password_reset_confirm_submit'
           className='btn btn-primary me-4'
-          disabled={formik.isSubmitting || !formik.isValid || !token}
+          disabled={formik.isSubmitting || !formik.isValid || tokenError || !sessionReady}
         >
           <span className='indicator-label'>
             <FormattedMessage id='AUTH.RESET.SUBMIT' />

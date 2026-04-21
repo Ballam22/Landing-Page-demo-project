@@ -1,19 +1,27 @@
-import { useState } from 'react'
-import { FormattedMessage } from 'react-intl'
-import { useAuth } from '../core/Auth'
+import {useState} from 'react'
+import {FormattedMessage} from 'react-intl'
+import {useAuth} from '../core/Auth'
+import {resendVerificationEmail} from '../core/_requests'
 
 export function EmailVerificationBanner() {
-  const { currentUser, emailVerificationDismissed, dismissEmailVerification } = useAuth()
+  const {currentUser, emailVerificationDismissed, dismissEmailVerification} = useAuth()
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState(false)
 
   if (!currentUser || currentUser.emailVerified || emailVerificationDismissed) {
     return null
   }
 
-  const handleResend = () => {
-    // No-op mock — in production this would send an email
-    setSent(true)
-    setTimeout(() => setSent(false), 4000)
+  const handleResend = async () => {
+    setError(false)
+    try {
+      await resendVerificationEmail(currentUser.email)
+      setSent(true)
+      setTimeout(() => setSent(false), 4000)
+    } catch (resendError) {
+      console.error(resendError)
+      setError(true)
+    }
   }
 
   return (
@@ -30,6 +38,11 @@ export function EmailVerificationBanner() {
         {sent && (
           <span className='text-success mt-1 fs-7'>
             <FormattedMessage id='AUTH.VERIFY.SENT' />
+          </span>
+        )}
+        {error && (
+          <span className='text-danger mt-1 fs-7'>
+            <FormattedMessage id='AUTH.VERIFY.ERROR' />
           </span>
         )}
       </div>

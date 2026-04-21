@@ -1,11 +1,21 @@
 /* eslint-disable react-refresh/only-export-components */
-import {FC, useState, useEffect, createContext, useContext, Dispatch, SetStateAction} from 'react'
+import {
+  FC,
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+} from 'react'
 import {LayoutSplashScreen} from '../../../../_metronic/layout/core'
 import {AuthModel, UserModel} from './_models'
 import * as authHelper from './AuthHelpers'
-import {getUserByToken} from './_requests'
+import {mapSessionToAuthModel, mapSupabaseUserToUserModel} from './_requests'
 import {WithChildren} from '../../../../_metronic/helpers'
 import useSessionTimeout from './hooks/useSessionTimeout'
+import {supabase} from '../../../lib/supabaseClient'
 
 type AuthContextProps = {
   auth: AuthModel | undefined
@@ -38,7 +48,7 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
   const [currentUser, setCurrentUser] = useState<UserModel | undefined>()
   const [emailVerificationDismissed, setEmailVerificationDismissed] = useState(false)
 
-  const saveAuth = (auth: AuthModel | undefined) => {
+  const saveAuth = useCallback((auth: AuthModel | undefined) => {
     setAuth(auth)
     if (auth) {
       authHelper.setAuth(auth)
@@ -46,19 +56,30 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
     } else {
       authHelper.removeAuth()
     }
-  }
+  }, [])
 
-  const logout = () => {
+  const logout = useCallback(() => {
     saveAuth(undefined)
     setCurrentUser(undefined)
-  }
+    void supabase.auth.signOut()
+  }, [saveAuth])
 
-  const dismissEmailVerification = () => {
+  const dismissEmailVerification = useCallback(() => {
     setEmailVerificationDismissed(true)
-  }
+  }, [])
 
   return (
-    <AuthContext.Provider value={{auth, saveAuth, currentUser, setCurrentUser, logout, emailVerificationDismissed, dismissEmailVerification}}>
+    <AuthContext.Provider
+      value={{
+        auth,
+        saveAuth,
+        currentUser,
+        setCurrentUser,
+        logout,
+        emailVerificationDismissed,
+        dismissEmailVerification,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
@@ -67,39 +88,64 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000
 
 const AuthInit: FC<WithChildren> = ({children}) => {
-  const {auth, currentUser, logout, setCurrentUser} = useAuth()
+  const {logout, saveAuth, setCurrentUser} = useAuth()
   const [showSplashScreen, setShowSplashScreen] = useState(true)
 
   useSessionTimeout({timeoutMs: SESSION_TIMEOUT_MS, onTimeout: logout})
 
-  // We should request user by authToken (IN OUR EXAMPLE IT'S API_TOKEN) before rendering the application
   useEffect(() => {
-    const requestUser = async (apiToken: string) => {
-      try {
-        if (!currentUser) {
-          const {data} = await getUserByToken(apiToken)
-          if (data) {
-            setCurrentUser(data)
-          }
-        }
-      } catch (error) {
-        console.error(error)
-        if (currentUser) {
-          logout()
-        }
-      } finally {
-        setShowSplashScreen(false)
-      }
-    }
+    let isMounted = true
 
-    if (auth && auth.api_token) {
-      requestUser(auth.api_token)
-    } else {
-      logout()
+    const syncAuthState = async () => {
+      const {data, error} = await supabase.auth.getSession()
+
+      if (!isMounted) {
+        return
+      }
+
+      if (error) {
+        console.error(error)
+        logout()
+        setShowSplashScreen(false)
+        return
+      }
+
+      if (data.session) {
+        saveAuth(mapSessionToAuthModel(data.session))
+        setCurrentUser(mapSupabaseUserToUserModel(data.session.user))
+      } else {
+        saveAuth(undefined)
+        setCurrentUser(undefined)
+      }
+
       setShowSplashScreen(false)
     }
-    // eslint-disable-next-line
-  }, [])
+
+    void syncAuthState()
+
+    const {
+      data: {subscription},
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) {
+        return
+      }
+
+      if (session) {
+        saveAuth(mapSessionToAuthModel(session))
+        setCurrentUser(mapSupabaseUserToUserModel(session.user))
+      } else {
+        saveAuth(undefined)
+        setCurrentUser(undefined)
+      }
+
+      setShowSplashScreen(false)
+    })
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [logout, saveAuth, setCurrentUser])
 
   return showSplashScreen ? <LayoutSplashScreen /> : <>{children}</>
 }

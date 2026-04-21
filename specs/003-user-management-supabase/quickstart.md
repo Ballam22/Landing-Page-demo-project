@@ -49,6 +49,25 @@ In Supabase Dashboard → Storage → New bucket:
 - Name: `avatars`
 - Public: ✅ enabled
 
+## Step 2b: Create the direct messages table
+
+Run this SQL in the Supabase SQL editor to enable the in-app message drawer:
+
+```sql
+CREATE TABLE IF NOT EXISTS public.messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id uuid NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
+  recipient_id uuid NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
+  body text NOT NULL CHECK (char_length(trim(body)) > 0),
+  read_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON public.messages (sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_recipient_id ON public.messages (recipient_id);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages (created_at DESC);
+```
+
 ## Step 3: Seed at least one Admin user
 
 ```sql

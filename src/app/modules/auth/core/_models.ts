@@ -44,7 +44,7 @@ export interface UserSocialNetworksModel {
 }
 
 export interface UserModel {
-  id: number
+  id: number | string
   username: string
   password: string | undefined
   email: string
@@ -106,5 +106,19 @@ export function isMockAuthError(error: unknown): error is MockAuthError {
     error !== null &&
     'type' in error &&
     typeof (error as MockAuthError).type === 'string'
+  )
+}
+
+export type AuthFlowError = {
+  type: 'duplicate_email' | 'email_not_confirmed' | 'invalid_credentials' | 'invalid_recovery_session'
+  message: string
+}
+
+export function isAuthFlowError(error: unknown): error is AuthFlowError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    typeof (error as AuthFlowError).type === 'string'
   )
 }
