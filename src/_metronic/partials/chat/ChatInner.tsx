@@ -4,13 +4,13 @@ import {useIntl} from 'react-intl'
 import {KTIcon} from '../../helpers'
 import {useAuth} from '../../../app/modules/auth'
 import {useCurrentProfile} from '../../../app/hooks/useCurrentProfile'
-import {ConversationSummary} from '../../../app/modules/messages/_models'
+import {ConversationSummary} from '../../../app/modules/messages/model/Message'
 import {
-  useConversation,
-  useMarkConversationAsRead,
-  useMessagesForUser,
+  useConversations,
+  useMarkAsRead,
+  useThread,
   useSendMessage,
-} from '../../../app/modules/messages/hooks/useMessages'
+} from '../../../app/modules/messages/controller/useMessageController'
 import {useUserController} from '../../../app/modules/user-management/controller/useUserController'
 
 type Props = {
@@ -23,10 +23,10 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
   const {data: profile, isLoading: isProfileLoading} = useCurrentProfile(currentUser?.email)
   const {users, isLoading: isUsersLoading} = useUserController()
   const {
-    data: allMessages = [],
+    data: conversationsData,
     isLoading: isMessagesLoading,
     error: messagesError,
-  } = useMessagesForUser(profile?.id)
+  } = useConversations(profile?.id)
 
   const [selectedUserId, setSelectedUserId] = useState('')
   const [draft, setDraft] = useState('')
@@ -39,6 +39,7 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
   )
 
   const conversationSummaries = useMemo(() => {
+    const allMessages = conversationsData?.allMessages ?? []
     const summaries: ConversationSummary[] = []
 
     for (const user of availableUsers) {
@@ -70,7 +71,7 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
     })
 
     return summaries
-  }, [allMessages, availableUsers, profile?.id])
+  }, [conversationsData, availableUsers, profile?.id])
 
   useEffect(() => {
     if (!availableUsers.length) {
@@ -98,9 +99,9 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
     data: conversation = [],
     isLoading: isConversationLoading,
     error: conversationError,
-  } = useConversation(profile?.id, selectedUserId || undefined)
+  } = useThread(profile?.id, selectedUserId || undefined)
   const sendMessageMutation = useSendMessage()
-  const markConversationAsReadMutation = useMarkConversationAsRead()
+  const markConversationAsReadMutation = useMarkAsRead()
   const unreadIncomingCount = useMemo(
     () =>
       conversation.filter(

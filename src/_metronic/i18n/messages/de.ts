@@ -186,6 +186,12 @@ const deMessages: Record<string, string> = {
   'MESSAGES.SENDING': 'Wird gesendet...',
   'MESSAGES.SEND_SUCCESS': 'Die Nachricht wurde erfolgreich gesendet.',
   'MESSAGES.SEND_ERROR': 'Die Nachricht konnte nicht gesendet werden.',
+  'MESSAGES.NEW_MESSAGE': 'Neue Nachricht',
+  'MESSAGES.EMPTY_STATE_TITLE': 'Noch keine Unterhaltungen',
+  'MESSAGES.EMPTY_STATE_HINT': 'Klicke auf "Neue Nachricht", um eine Unterhaltung zu starten',
+  'MESSAGES.PAGE_TITLE': 'Nachrichten',
+  'MESSAGES.EMPTY_THREAD': 'Noch keine Nachrichten. Schreib die erste!',
+  'MESSAGES.SELECT_RECIPIENT': 'Empfänger auswählen',
 
   'USER_DETAIL.TITLE': 'Benutzerprofil',
   'USER_DETAIL.CLOSE': 'Schließen',

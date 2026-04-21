@@ -14,6 +14,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-21
 - Supabase (PostgreSQL) via `src/app/lib/supabaseClient.ts` | Files: Supabase Storage (`avatars` bucket) (004-user-management-mvc)
 - TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Bootstrap 5 + Metronic SCSS (005-user-detail-drawer)
 - No new storage — reads existing `users` table data via the existing layered architecture (controller → service → repository) (005-user-detail-drawer)
+- TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Supabase JS ^2.104.0 (006-direct-messages)
+- Database: Supabase (PostgreSQL) via `src/app/lib/supabaseClient.ts` | No file uploads in this feature (006-direct-messages)
 
 - TypeScript 5.3.3 + React 18.2, React Router DOM 6.30, Formik 2.2.9, Yup 1.0, Axios 1.13.5, React Intl 6.4.4 (001-user-auth)
 
@@ -34,9 +36,9 @@ npm test; npm run lint
 TypeScript 5.3.3: Follow standard conventions
 
 ## Recent Changes
+- 006-direct-messages: Added TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Supabase JS ^2.104.0
 - 005-user-detail-drawer: Added TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Bootstrap 5 + Metronic SCSS
 - 004-user-management-mvc: Added TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0, Supabase JS ^2.104.0
-- 003-user-management-supabase: Added TypeScript ^5.3.3 + React ^18.2.0 + Supabase JS ^2.104.0, React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0,
 
 
 <!-- MANUAL ADDITIONS START -->

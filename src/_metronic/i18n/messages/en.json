@@ -234,6 +234,12 @@
   "MESSAGES.SENDING": "Sending...",
   "MESSAGES.SEND_SUCCESS": "The message was sent successfully.",
   "MESSAGES.SEND_ERROR": "The message could not be sent.",
+  "MESSAGES.NEW_MESSAGE": "New message",
+  "MESSAGES.EMPTY_STATE_TITLE": "No conversations yet",
+  "MESSAGES.EMPTY_STATE_HINT": "Click \"New message\" to start a conversation",
+  "MESSAGES.PAGE_TITLE": "Messages",
+  "MESSAGES.EMPTY_THREAD": "No messages yet. Send the first one!",
+  "MESSAGES.SELECT_RECIPIENT": "Select recipient",
 
   "USER_DETAIL.TITLE": "User Profile",
   "USER_DETAIL.CLOSE": "Close",

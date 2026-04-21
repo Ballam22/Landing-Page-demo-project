@@ -5,7 +5,7 @@ import {useLayout} from '../../core'
 import {UserAvatarButton} from '../../../../app/components/UserAvatarButton'
 import {useAuth} from '../../../../app/modules/auth'
 import {useCurrentProfile} from '../../../../app/hooks/useCurrentProfile'
-import {useUnreadMessageCount} from '../../../../app/modules/messages/hooks/useMessages'
+import {useUnreadCount} from '../../../../app/modules/messages/controller/useMessageController'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
@@ -16,7 +16,7 @@ const Navbar = () => {
   const {config} = useLayout()
   const {currentUser} = useAuth()
   const {data: profile} = useCurrentProfile(currentUser?.email)
-  const {data: unreadCount = 0} = useUnreadMessageCount(profile?.id)
+  const {data: unreadCount = 0} = useUnreadCount(profile?.id)
 
   return (
     <div className='app-navbar flex-shrink-0'>

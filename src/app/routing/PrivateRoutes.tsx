@@ -18,6 +18,7 @@ const BannerLayout = () => (
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
   const UserManagementPage = lazy(() => import('../modules/user-management/UserManagementPage'))
+  const MessagesPage = lazy(() => import('../modules/messages/components/MessagesPage'))
 
   return (
     <Routes>
@@ -40,6 +41,14 @@ const PrivateRoutes = () => {
                 <RoleGuard allowedRoles={['Admin', 'Manager']}>
                   <UserManagementPage />
                 </RoleGuard>
+              </SuspensedView>
+            }
+          />
+          <Route
+            path='messages'
+            element={
+              <SuspensedView>
+                <MessagesPage />
               </SuspensedView>
             }
           />

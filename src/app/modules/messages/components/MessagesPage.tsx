@@ -1,0 +1,134 @@
+import {useState} from 'react'
+import {useIntl} from 'react-intl'
+import {useAuth} from '../../auth'
+import {useCurrentProfile} from '../../../hooks/useCurrentProfile'
+import {useUserController} from '../../user-management/controller/useUserController'
+import {useConversations, useMarkAsRead} from '../controller/useMessageController'
+import {ConversationList} from './ConversationList'
+import {MessageThread} from './MessageThread'
+
+const MessagesPage = () => {
+  const intl = useIntl()
+  const {currentUser} = useAuth()
+  const {data: profile} = useCurrentProfile(currentUser?.email)
+  const currentUserId = profile?.id ?? null
+
+  const {users} = useUserController()
+  const {
+    data: conversationsData,
+    isLoading,
+  } = useConversations(currentUserId ?? undefined)
+
+  const conversations = conversationsData?.conversations ?? []
+  const markAsRead = useMarkAsRead()
+
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [pickerOpen, setPicker] = useState(false)
+
+  const activeUsersExcludingSelf = users.filter(
+    (u) => u.status === 'Active' && u.id !== currentUserId
+  )
+
+  const handleSelect = (userId: string) => {
+    setSelectedUserId(userId)
+    if (currentUserId) {
+      markAsRead.mutate({userId: currentUserId, otherUserId: userId})
+    }
+  }
+
+  const selectedUser = activeUsersExcludingSelf.find((u) => u.id === selectedUserId) ?? null
+
+  return (
+    <div className='d-flex h-100' style={{minHeight: '600px'}}>
+      <ConversationList
+        conversations={conversations}
+        users={activeUsersExcludingSelf}
+        selectedUserId={selectedUserId}
+        onSelect={handleSelect}
+        onNewConversation={() => setPicker(true)}
+        isLoading={isLoading}
+      />
+
+      <div className='flex-grow-1 d-flex flex-column'>
+        {!selectedUser ? (
+          <div className='flex-grow-1 d-flex align-items-center justify-content-center text-muted'>
+            {intl.formatMessage({id: 'MESSAGES.EMPTY_THREAD'})}
+          </div>
+        ) : (
+          <MessageThread
+            currentUserId={currentUserId!}
+            otherUser={selectedUser}
+            allUsers={activeUsersExcludingSelf}
+          />
+        )}
+      </div>
+
+      {pickerOpen && (
+        <div
+          className='modal fade show d-block'
+          style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+          onClick={() => setPicker(false)}
+        >
+          <div className='modal-dialog modal-dialog-centered' onClick={(e) => e.stopPropagation()}>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <h5 className='modal-title'>
+                  {intl.formatMessage({id: 'MESSAGES.SELECT_RECIPIENT'})}
+                </h5>
+                <button
+                  type='button'
+                  className='btn-close'
+                  onClick={() => setPicker(false)}
+                />
+              </div>
+              <div className='modal-body p-0'>
+                {activeUsersExcludingSelf.length === 0 ? (
+                  <div className='text-center text-muted py-6'>
+                    {intl.formatMessage({id: 'MESSAGES.NO_RECIPIENTS'})}
+                  </div>
+                ) : (
+                  activeUsersExcludingSelf.map((user) => (
+                    <button
+                      key={user.id}
+                      type='button'
+                      className='btn btn-flush d-flex align-items-center gap-3 w-100 text-start px-5 py-3 border-bottom border-gray-200'
+                      onClick={() => {
+                        handleSelect(user.id)
+                        setPicker(false)
+                      }}
+                    >
+                      <span className='symbol symbol-40px'>
+                        {user.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt={user.fullName}
+                            className='symbol-label rounded-circle'
+                          />
+                        ) : (
+                          <span className='symbol-label bg-light-primary text-primary fw-bold fs-6'>
+                            {user.fullName
+                              .split(' ')
+                              .map((p) => p[0] ?? '')
+                              .join('')
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </span>
+                        )}
+                      </span>
+                      <div>
+                        <div className='fw-bold text-gray-900'>{user.fullName}</div>
+                        <div className='text-muted fs-7'>{user.email}</div>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default MessagesPage

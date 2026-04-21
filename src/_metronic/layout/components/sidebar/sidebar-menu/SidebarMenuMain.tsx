@@ -19,6 +19,12 @@ const SidebarMenuMain = () => {
         fontIcon='bi-people'
       />
       <SidebarMenuItem
+        to='/messages'
+        icon='message-text-2'
+        title={intl.formatMessage({id: 'MESSAGES.PAGE_TITLE'})}
+        fontIcon='bi-chat'
+      />
+      <SidebarMenuItem
         to='/profile/overview'
         icon='profile-circle'
         title={intl.formatMessage({id: 'MENU.PROFILE'})}
