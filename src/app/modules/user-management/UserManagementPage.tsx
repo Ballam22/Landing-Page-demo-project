@@ -1,7 +1,7 @@
 import {FC, useState, useCallback} from 'react'
 import {useIntl} from 'react-intl'
 import {PageTitle} from '../../../_metronic/layout/core'
-import {EMPTY_SOCIAL_LINKS, User, UserFormValues} from './_models'
+import {EMPTY_SOCIAL_LINKS, User, UserFormValues} from './model/User'
 import {UserManagementProvider} from './UserManagementContext'
 import {useUserManagement} from './hooks/useUserManagement'
 import {UsersTable} from './components/UsersTable'

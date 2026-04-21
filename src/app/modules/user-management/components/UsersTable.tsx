@@ -1,8 +1,8 @@
 import {FC, useMemo} from 'react'
 import {useTable, Column, Row, ColumnInstance} from 'react-table'
 import {useIntl} from 'react-intl'
-import {User} from '../_models'
-import {useUserList} from '../hooks/useUsers'
+import {User} from '../model/User'
+import {useUserController} from '../controller/useUserController'
 import {RoleBadge} from './RoleBadge'
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 
 const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
   const intl = useIntl()
-  const {data: users = [], isLoading, isError} = useUserList()
+  const {users, isLoading, error} = useUserController()
 
   const columns: Column<User>[] = useMemo(
     () => [
@@ -141,7 +141,7 @@ const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
     )
   }
 
-  if (isError) {
+  if (error) {
     return (
       <div className='alert alert-danger mx-4 my-4'>
         {intl.formatMessage({id: 'USER_MANAGEMENT.LOAD_ERROR'})}

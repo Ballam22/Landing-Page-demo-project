@@ -11,7 +11,7 @@ import {
   useMessagesForUser,
   useSendMessage,
 } from '../../../app/modules/messages/hooks/useMessages'
-import {useUserList} from '../../../app/modules/user-management/hooks/useUsers'
+import {useUserController} from '../../../app/modules/user-management/controller/useUserController'
 
 type Props = {
   isDrawer?: boolean
@@ -21,7 +21,7 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
   const intl = useIntl()
   const {currentUser} = useAuth()
   const {data: profile, isLoading: isProfileLoading} = useCurrentProfile(currentUser?.email)
-  const {data: users = [], isLoading: isUsersLoading} = useUserList()
+  const {users, isLoading: isUsersLoading} = useUserController()
   const {
     data: allMessages = [],
     isLoading: isMessagesLoading,

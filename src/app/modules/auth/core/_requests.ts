@@ -163,6 +163,7 @@ export async function register(
   firstname: string,
   lastname: string,
   password: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _passwordConfirmation: string
 ): Promise<RegisterResult> {
   const {data, error} = await supabase.auth.signUp({
@@ -228,6 +229,7 @@ export async function resetPassword(newPassword: string): Promise<void> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getUserByToken(_token?: string): Promise<{data: UserModel}> {
   const {data, error} = await supabase.auth.getUser()
 

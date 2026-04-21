@@ -3,7 +3,7 @@ import {useIntl} from 'react-intl'
 import {Content} from '../../../../_metronic/layout/components/content'
 import {useAuth} from '../../auth'
 import {getInitials, useCurrentProfile} from '../../../hooks/useCurrentProfile'
-import {useUserList} from '../../user-management/hooks/useUsers'
+import {useUserController} from '../../user-management/controller/useUserController'
 import {RoleBadge} from '../../user-management/components/RoleBadge'
 
 function formatDate(value: string | undefined, locale: string): string {
@@ -22,7 +22,7 @@ export function Overview() {
   const intl = useIntl()
   const {currentUser} = useAuth()
   const {data: profile, isLoading: isProfileLoading} = useCurrentProfile(currentUser?.email)
-  const {data: users = [], isLoading: isUsersLoading, isError, error} = useUserList()
+  const {users, isLoading: isUsersLoading, error} = useUserController()
 
   const activeUsers = users.filter((user) => user.status === 'Active').length
   const inactiveUsers = users.filter((user) => user.status === 'Inactive').length
@@ -189,9 +189,9 @@ export function Overview() {
               </h3>
             </div>
             <div className='card-body pt-2'>
-              {isError && <div className='alert alert-danger'>{(error as Error).message}</div>}
+              {error && <div className='alert alert-danger'>{error.message}</div>}
 
-              {!isError && recentUsers.length === 0 && !isUsersLoading && (
+              {!error && recentUsers.length === 0 && !isUsersLoading && (
                 <div className='text-gray-600 fw-semibold py-10 text-center'>
                   {intl.formatMessage({id: 'PROFILE.OVERVIEW.NO_USERS'})}
                 </div>

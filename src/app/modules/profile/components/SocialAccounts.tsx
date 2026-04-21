@@ -6,8 +6,8 @@ import {useQueryClient} from 'react-query'
 import {Content} from '../../../../_metronic/layout/components/content'
 import {useAuth} from '../../auth'
 import {useCurrentProfile} from '../../../hooks/useCurrentProfile'
-import {updateUser} from '../../user-management/_requests'
-import {EMPTY_SOCIAL_LINKS, SocialLinks, SocialPlatform} from '../../user-management/_models'
+import {updateUser} from '../../user-management/service/userService'
+import {EMPTY_SOCIAL_LINKS, SocialLinks, SocialPlatform} from '../../user-management/model/User'
 
 const SOCIAL_PLATFORMS: Array<{
   key: SocialPlatform

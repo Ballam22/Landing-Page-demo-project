@@ -1,8 +1,8 @@
 import {createContext, FC, ReactNode, useEffect, useState} from 'react'
-import {supabase} from '../../lib/supabaseClient'
 import {useAuth} from '../auth'
-import {User} from './_models'
-import {useAddUser, useRemoveUser, useUpdateUser} from './hooks/useUsers'
+import {User} from './model/User'
+import {resolveCurrentUserId} from './service/userService'
+import {useUserController} from './controller/useUserController'
 
 type UserManagementContextType = {
   currentUserId: string | null
@@ -22,30 +22,10 @@ const UserManagementProvider: FC<Props> = ({children}) => {
   useEffect(() => {
     const email = currentUser?.email
     if (!email) return
-    supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .single()
-      .then(({data}) => {
-        setCurrentUserId(data?.id ?? null)
-      })
+    resolveCurrentUserId(email).then(setCurrentUserId)
   }, [currentUser?.email])
 
-  const addMutation = useAddUser()
-  const updateMutation = useUpdateUser()
-  const removeMutation = useRemoveUser()
-
-  const addUser = (payload: Omit<User, 'id'>, avatarFile?: File) =>
-    addMutation.mutateAsync({payload, avatarFile})
-
-  const updateUser = (
-    id: string,
-    payload: Partial<Omit<User, 'id'>>,
-    avatarFile?: File
-  ) => updateMutation.mutateAsync({id, payload, avatarFile})
-
-  const deleteUser = (id: string) => removeMutation.mutateAsync(id)
+  const {addUser, updateUser, deleteUser} = useUserController()
 
   return (
     <UserManagementContext.Provider value={{currentUserId, addUser, updateUser, deleteUser}}>

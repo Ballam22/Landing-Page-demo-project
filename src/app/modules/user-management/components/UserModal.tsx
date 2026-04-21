@@ -1,8 +1,8 @@
 import {FC, useEffect} from 'react'
 import {useIntl} from 'react-intl'
-import {UserFormValues} from '../_models'
+import {UserFormValues} from '../model/User'
 import {UserModalForm} from './UserModalForm'
-import {useUserList} from '../hooks/useUsers'
+import {useUserController} from '../controller/useUserController'
 
 type Props = {
   isOpen: boolean
@@ -14,7 +14,7 @@ type Props = {
 
 const UserModal: FC<Props> = ({isOpen, onClose, initialValues, mode, userId}) => {
   const intl = useIntl()
-  const {data: users = []} = useUserList()
+  const {users} = useUserController()
 
   useEffect(() => {
     if (isOpen) {

@@ -1,6 +1,6 @@
 import {useQuery} from 'react-query'
 import {supabase} from '../lib/supabaseClient'
-import {EMPTY_SOCIAL_LINKS, Role, SocialLinks, Status} from '../modules/user-management/_models'
+import {EMPTY_SOCIAL_LINKS, Role, SocialLinks, Status} from '../modules/user-management/model/User'
 
 export type CurrentProfile = {
   id: string

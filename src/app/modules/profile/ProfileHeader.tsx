@@ -6,7 +6,7 @@ import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
 import {Content} from '../../../_metronic/layout/components/content'
 import {useAuth} from '../auth'
 import {getInitials, useCurrentProfile} from '../../hooks/useCurrentProfile'
-import {useUserList} from '../user-management/hooks/useUsers'
+import {useUserController} from '../user-management/controller/useUserController'
 import {RoleBadge} from '../user-management/components/RoleBadge'
 
 const ProfileHeader: FC = () => {
@@ -14,7 +14,7 @@ const ProfileHeader: FC = () => {
   const location = useLocation()
   const {currentUser} = useAuth()
   const {data: profile} = useCurrentProfile(currentUser?.email)
-  const {data: users = []} = useUserList()
+  const {users} = useUserController()
 
   const fullName =
     profile?.fullName ||

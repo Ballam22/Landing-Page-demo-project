@@ -1,6 +1,6 @@
 import {FC} from 'react'
 import {useIntl} from 'react-intl'
-import {Role} from '../_models'
+import {Role} from '../model/User'
 
 const badgeClassMap: Record<Role, string> = {
   Admin: 'badge badge-light-primary',

@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 import {getIn, useFormik} from 'formik'
 import {useIntl} from 'react-intl'
 import clsx from 'clsx'
-import {Role, SocialPlatform, Status, UserFormValues} from '../_models'
+import {Role, SocialPlatform, Status, UserFormValues} from '../model/User'
 import {useUserManagement} from '../hooks/useUserManagement'
 
 type Props = {

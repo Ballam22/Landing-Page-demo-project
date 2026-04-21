@@ -5,12 +5,12 @@ import {PageTitle} from '../../../_metronic/layout/core'
 import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
 import {Content} from '../../../_metronic/layout/components/content'
 import {useAuth} from '../../modules/auth'
-import {useUserList} from '../../modules/user-management/hooks/useUsers'
+import {useUserController} from '../../modules/user-management/controller/useUserController'
 
 const DashboardPage: FC = () => {
   const intl = useIntl()
   const {currentUser} = useAuth()
-  const {data: users = [], isLoading, isError, error} = useUserList()
+  const {users, isLoading, error} = useUserController()
 
   const activeUsers = users.filter((user) => user.status === 'Active').length
   const adminUsers = users.filter((user) => user.role === 'Admin').length
@@ -120,13 +120,13 @@ const DashboardPage: FC = () => {
                   </div>
                 )}
 
-                {isError && (
+                {error && (
                   <div className='alert alert-danger mb-0'>
                     {(error as Error)?.message || intl.formatMessage({id: 'DASHBOARD.LOAD_ERROR'})}
                   </div>
                 )}
 
-                {!isLoading && !isError && recentUsers.length === 0 && (
+                {!isLoading && !error && recentUsers.length === 0 && (
                   <div className='py-10 text-center'>
                     <div className='fs-4 fw-semibold text-gray-800 mb-2'>
                       {intl.formatMessage({id: 'DASHBOARD.NO_USERS_TITLE'})}
@@ -140,7 +140,7 @@ const DashboardPage: FC = () => {
                   </div>
                 )}
 
-                {!isLoading && !isError && recentUsers.length > 0 && (
+                {!isLoading && !error && recentUsers.length > 0 && (
                   <div className='table-responsive'>
                     <table className='table align-middle gs-0 gy-4'>
                       <thead>

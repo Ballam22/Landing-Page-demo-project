@@ -1,8 +1,8 @@
 import {FC, ReactNode, useEffect, useState} from 'react'
 import {Navigate} from 'react-router-dom'
-import {supabase} from '../../../../lib/supabaseClient'
 import {useAuth} from '../../../auth'
-import {Role} from '../../_models'
+import {Role} from '../../model/User'
+import {getUserRoleByEmail} from '../../service/userService'
 
 type Props = {
   allowedRoles: Role[]
@@ -22,16 +22,10 @@ const RoleGuard: FC<Props> = ({allowedRoles, children}) => {
       setStatus('denied')
       return
     }
-    supabase
-      .from('users')
-      .select('role')
-      .eq('email', email)
-      .single()
-      .then(({data}) => {
-        if (cancelled) return
-        const role = data?.role as Role | undefined
-        setStatus(role && allowedRoles.includes(role) ? 'allowed' : 'denied')
-      })
+    getUserRoleByEmail(email).then((role) => {
+      if (cancelled) return
+      setStatus(role && allowedRoles.includes(role) ? 'allowed' : 'denied')
+    })
     return () => {
       cancelled = true
     }
