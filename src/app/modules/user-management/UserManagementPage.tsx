@@ -7,6 +7,8 @@ import {useUserManagement} from './hooks/useUserManagement'
 import {UsersTable} from './components/UsersTable'
 import {UserModal} from './components/UserModal'
 import {DeleteConfirmDialog} from './components/DeleteConfirmDialog'
+import {useUserDetailDrawer} from './controller/useUserDetailDrawer'
+import {UserDetailDrawer} from './components/UserDetailDrawer'
 
 const EMPTY_FORM_VALUES: UserFormValues = {
   fullName: '',
@@ -39,6 +41,7 @@ const userToFormValues = (user: User): UserFormValues => ({
 const UserManagementContent: FC = () => {
   const intl = useIntl()
   const {currentUserId, deleteUser} = useUserManagement()
+  const {selectedDetailUser, isOpen, openDrawer, closeDrawer} = useUserDetailDrawer()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -113,8 +116,10 @@ const UserManagementContent: FC = () => {
         <div className='card-body py-4'>
           <UsersTable
             currentUserId={currentUserId}
+            selectedDetailUserId={selectedDetailUser?.id ?? null}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onViewDetails={openDrawer}
           />
         </div>
       </div>
@@ -133,6 +138,8 @@ const UserManagementContent: FC = () => {
         onConfirm={handleDeleteConfirm}
         userName={userToDelete?.fullName ?? ''}
       />
+
+      <UserDetailDrawer user={selectedDetailUser} isOpen={isOpen} onClose={closeDrawer} />
     </>
   )
 }

@@ -233,5 +233,12 @@
   "MESSAGES.SEND": "Send",
   "MESSAGES.SENDING": "Sending...",
   "MESSAGES.SEND_SUCCESS": "The message was sent successfully.",
-  "MESSAGES.SEND_ERROR": "The message could not be sent."
+  "MESSAGES.SEND_ERROR": "The message could not be sent.",
+
+  "USER_DETAIL.TITLE": "User Profile",
+  "USER_DETAIL.CLOSE": "Close",
+  "USER_DETAIL.NO_SOCIAL_ACCOUNTS": "No social accounts connected",
+  "USER_DETAIL.SOCIAL_LINKEDIN": "LinkedIn",
+  "USER_DETAIL.SOCIAL_INSTAGRAM": "Instagram",
+  "USER_DETAIL.SOCIAL_X": "X"
 }

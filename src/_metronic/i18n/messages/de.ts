@@ -186,6 +186,13 @@ const deMessages: Record<string, string> = {
   'MESSAGES.SENDING': 'Wird gesendet...',
   'MESSAGES.SEND_SUCCESS': 'Die Nachricht wurde erfolgreich gesendet.',
   'MESSAGES.SEND_ERROR': 'Die Nachricht konnte nicht gesendet werden.',
+
+  'USER_DETAIL.TITLE': 'Benutzerprofil',
+  'USER_DETAIL.CLOSE': 'Schließen',
+  'USER_DETAIL.NO_SOCIAL_ACCOUNTS': 'Keine sozialen Konten verbunden',
+  'USER_DETAIL.SOCIAL_LINKEDIN': 'LinkedIn',
+  'USER_DETAIL.SOCIAL_INSTAGRAM': 'Instagram',
+  'USER_DETAIL.SOCIAL_X': 'X',
 }
 
 export default deMessages

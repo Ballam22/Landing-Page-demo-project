@@ -6,11 +6,14 @@ import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
 import {Content} from '../../../_metronic/layout/components/content'
 import {useAuth} from '../../modules/auth'
 import {useUserController} from '../../modules/user-management/controller/useUserController'
+import {useUserDetailDrawer} from '../../modules/user-management/controller/useUserDetailDrawer'
+import {UserDetailDrawer} from '../../modules/user-management/components/UserDetailDrawer'
 
 const DashboardPage: FC = () => {
   const intl = useIntl()
   const {currentUser} = useAuth()
   const {users, isLoading, error} = useUserController()
+  const {selectedDetailUser, isOpen, openDrawer, closeDrawer} = useUserDetailDrawer()
 
   const activeUsers = users.filter((user) => user.status === 'Active').length
   const adminUsers = users.filter((user) => user.role === 'Admin').length
@@ -157,7 +160,12 @@ const DashboardPage: FC = () => {
                       </thead>
                       <tbody>
                         {recentUsers.map((user) => (
-                          <tr key={user.id}>
+                          <tr
+                            key={user.id}
+                            onClick={() => openDrawer(user)}
+                            style={{cursor: 'pointer'}}
+                            className={user.id === selectedDetailUser?.id ? 'table-active' : ''}
+                          >
                             <td className='ps-4'>
                               <div className='d-flex flex-column'>
                                 <span className='text-gray-900 fw-bold fs-6'>{user.fullName}</span>
@@ -188,6 +196,8 @@ const DashboardPage: FC = () => {
           </div>
         </div>
       </Content>
+
+      <UserDetailDrawer user={selectedDetailUser} isOpen={isOpen} onClose={closeDrawer} />
     </>
   )
 }

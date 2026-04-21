@@ -7,11 +7,13 @@ import {RoleBadge} from './RoleBadge'
 
 type Props = {
   currentUserId: string | null
+  selectedDetailUserId: string | null
   onEdit: (user: User) => void
   onDelete: (user: User) => void
+  onViewDetails: (user: User) => void
 }
 
-const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
+const UsersTable: FC<Props> = ({currentUserId, selectedDetailUserId, onEdit, onDelete, onViewDetails}) => {
   const intl = useIntl()
   const {users, isLoading, error} = useUserController()
 
@@ -93,7 +95,7 @@ const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
                 type='button'
                 className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm'
                 title={intl.formatMessage({id: 'USER_MANAGEMENT.EDIT_USER'})}
-                onClick={() => onEdit(row.original)}
+                onClick={(e) => {e.stopPropagation(); onEdit(row.original)}}
               >
                 <i className='ki-duotone ki-pencil fs-4'>
                   <span className='path1'></span>
@@ -104,7 +106,7 @@ const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
                 type='button'
                 className='btn btn-icon btn-bg-light btn-active-color-danger btn-sm'
                 title={intl.formatMessage({id: 'USER_MANAGEMENT.DELETE_USER'})}
-                onClick={() => onDelete(row.original)}
+                onClick={(e) => {e.stopPropagation(); onDelete(row.original)}}
                 disabled={isOwnRow}
                 style={isOwnRow ? {opacity: 0.4, cursor: 'not-allowed'} : undefined}
               >
@@ -172,8 +174,15 @@ const UsersTable: FC<Props> = ({currentUserId, onEdit, onDelete}) => {
             rows.map((row: Row<User>) => {
               prepareRow(row)
               const {key: rowKey, ...rowProps} = row.getRowProps()
+              const isActiveRow = row.original.id === selectedDetailUserId
               return (
-                <tr key={rowKey} {...rowProps}>
+                <tr
+                  key={rowKey}
+                  {...rowProps}
+                  onClick={() => onViewDetails(row.original)}
+                  style={{cursor: 'pointer'}}
+                  className={isActiveRow ? 'table-active' : ''}
+                >
                   {row.cells.map((cell) => {
                     const {key: cellKey, ...cellProps} = cell.getCellProps()
                     return (
