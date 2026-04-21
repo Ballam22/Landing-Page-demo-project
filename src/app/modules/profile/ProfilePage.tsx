@@ -1,10 +1,7 @@
 import {Navigate, Routes, Route, Outlet} from 'react-router-dom'
 import {PageLink, PageTitle} from '../../../_metronic/layout/core'
 import {Overview} from './components/Overview'
-import {Projects} from './components/Projects'
-import {Campaigns} from './components/Campaigns'
-import {Documents} from './components/Documents'
-import {Connections} from './components/Connections'
+import {SocialAccounts} from './components/SocialAccounts'
 import {ProfileHeader} from './ProfileHeader'
 
 const profileBreadCrumbs: Array<PageLink> = [
@@ -42,41 +39,15 @@ const ProfilePage = () => (
         }
       />
       <Route
-        path='projects'
+        path='social-accounts'
         element={
           <>
-            <PageTitle breadcrumbs={profileBreadCrumbs}>Projects</PageTitle>
-            <Projects />
+            <PageTitle breadcrumbs={profileBreadCrumbs}>Social Accounts</PageTitle>
+            <SocialAccounts />
           </>
         }
       />
-      <Route
-        path='campaigns'
-        element={
-          <>
-            <PageTitle breadcrumbs={profileBreadCrumbs}>Campaigns</PageTitle>
-            <Campaigns />
-          </>
-        }
-      />
-      <Route
-        path='documents'
-        element={
-          <>
-            <PageTitle breadcrumbs={profileBreadCrumbs}>Documents</PageTitle>
-            <Documents />
-          </>
-        }
-      />
-      <Route
-        path='connections'
-        element={
-          <>
-            <PageTitle breadcrumbs={profileBreadCrumbs}>Connections</PageTitle>
-            <Connections />
-          </>
-        }
-      />
+      <Route path='*' element={<Navigate to='/profile/overview' replace />} />
       <Route index element={<Navigate to='/profile/overview' />} />
     </Route>
   </Routes>

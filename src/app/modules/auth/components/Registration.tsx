@@ -2,12 +2,12 @@ import {useState, useEffect} from 'react'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {getUserByToken, register} from '../core/_requests'
+import {register} from '../core/_requests'
 import {Link} from 'react-router-dom'
 import {PasswordMeterComponent} from '../../../../_metronic/assets/ts/components'
 import {useAuth} from '../core/Auth'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {isMockAuthError} from '../core/_models'
+import {isAuthFlowError} from '../core/_models'
 
 const initialValues = {
   firstname: '',
@@ -21,6 +21,8 @@ const initialValues = {
 export function Registration() {
   const intl = useIntl()
   const [loading, setLoading] = useState(false)
+  const [registrationComplete, setRegistrationComplete] = useState(false)
+  const [verificationEmail, setVerificationEmail] = useState('')
   const {saveAuth, setCurrentUser} = useAuth()
 
   const registrationSchema = Yup.object().shape({
@@ -57,20 +59,30 @@ export function Registration() {
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
       try {
-        const {data: auth} = await register(
+        const result = await register(
           values.email,
           values.firstname,
           values.lastname,
           values.password,
           values.changepassword
         )
-        saveAuth(auth)
-        const {data: user} = await getUserByToken(auth.api_token)
-        setCurrentUser(user)
+
+        if (result.requiresEmailVerification || !result.auth || !result.user) {
+          saveAuth(undefined)
+          setCurrentUser(undefined)
+          setVerificationEmail(values.email)
+          setRegistrationComplete(true)
+          setSubmitting(false)
+          setLoading(false)
+          return
+        }
+
+        saveAuth(result.auth)
+        setCurrentUser(result.user)
       } catch (error) {
         console.error(error)
         saveAuth(undefined)
-        if (isMockAuthError(error) && error.type === 'duplicate_email') {
+        if (isAuthFlowError(error) && error.type === 'duplicate_email') {
           setStatus(intl.formatMessage({id: 'AUTH.REGISTER.ERROR'}))
         } else {
           setStatus(intl.formatMessage({id: 'AUTH.REGISTER.ERROR'}))
@@ -84,6 +96,30 @@ export function Registration() {
   useEffect(() => {
     PasswordMeterComponent.bootstrap()
   }, [])
+
+  if (registrationComplete) {
+    return (
+      <form className='form w-100 fv-plugins-bootstrap5 fv-plugins-framework' noValidate>
+        <div className='text-center mb-11'>
+          <h1 className='text-gray-900 fw-bolder mb-3'>
+            <FormattedMessage id='AUTH.REGISTER.TITLE' />
+          </h1>
+        </div>
+
+        <div className='mb-10 alert alert-success'>
+          <div className='alert-text font-weight-bold'>
+            {intl.formatMessage({id: 'AUTH.REGISTER.CHECK_EMAIL'}, {email: verificationEmail})}
+          </div>
+        </div>
+
+        <div className='text-center'>
+          <Link to='/auth/login' className='btn btn-lg btn-primary w-100 mb-5'>
+            <FormattedMessage id='AUTH.REGISTER.SIGN_IN_LINK' />
+          </Link>
+        </div>
+      </form>
+    )
+  }
 
   return (
     <form

@@ -1,24 +1,53 @@
-
-import { FC } from 'react'
-import {KTIcon, toAbsoluteUrl} from '../../../_metronic/helpers'
+import {FC} from 'react'
 import {Link, useLocation} from 'react-router-dom'
-import {Dropdown1} from '../../../_metronic/partials'
-import { ToolbarWrapper } from '../../../_metronic/layout/components/toolbar'
-import { Content } from '../../../_metronic/layout/components/content'
+import {useIntl} from 'react-intl'
+import {KTIcon} from '../../../_metronic/helpers'
+import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
+import {Content} from '../../../_metronic/layout/components/content'
+import {useAuth} from '../auth'
+import {getInitials, useCurrentProfile} from '../../hooks/useCurrentProfile'
+import {useUserController} from '../user-management/controller/useUserController'
+import {RoleBadge} from '../user-management/components/RoleBadge'
 
 const ProfileHeader: FC = () => {
+  const intl = useIntl()
   const location = useLocation()
+  const {currentUser} = useAuth()
+  const {data: profile} = useCurrentProfile(currentUser?.email)
+  const {users} = useUserController()
+
+  const fullName =
+    profile?.fullName ||
+    currentUser?.fullname ||
+    [currentUser?.first_name, currentUser?.last_name].filter(Boolean).join(' ').trim() ||
+    currentUser?.email ||
+    intl.formatMessage({id: 'PROFILE.HEADER.DEFAULT_USER'})
+  const email = profile?.email || currentUser?.email || intl.formatMessage({id: 'PROFILE.HEADER.NO_EMAIL'})
+  const initials = getInitials(fullName)
+  const activeUsers = users.filter((user) => user.status === 'Active').length
+  const adminUsers = users.filter((user) => user.role === 'Admin').length
+  const profileCompletion = [profile?.avatarUrl, profile?.fullName, profile?.email].filter(Boolean).length * 33
 
   return (
     <>
-      <ToolbarWrapper />
+      <ToolbarWrapper showActions={false} />
       <Content>
         <div className='card mb-5 mb-xl-10'>
           <div className='card-body pt-9 pb-0'>
             <div className='d-flex flex-wrap flex-sm-nowrap mb-3'>
               <div className='me-7 mb-4'>
-                <div className='symbol symbol-100px symbol-lg-160px symbol-fixed position-relative'>
-                  <img src={toAbsoluteUrl('/media/avatars/300-1.jpg')} alt='Metornic' />
+                <div className='symbol symbol-100px symbol-lg-160px symbol-fixed position-relative overflow-hidden'>
+                  {profile?.avatarUrl ? (
+                    <img
+                      src={`${profile.avatarUrl}?t=${Date.now()}`}
+                      alt={fullName}
+                      style={{objectFit: 'cover'}}
+                    />
+                  ) : (
+                    <div className='symbol-label fs-2qx fw-bold bg-light-primary text-primary w-100 h-100'>
+                      {initials}
+                    </div>
+                  )}
                   <div className='position-absolute translate-middle bottom-0 start-100 mb-6 bg-success rounded-circle border border-4 border-white h-20px w-20px'></div>
                 </div>
               </div>
@@ -26,69 +55,31 @@ const ProfileHeader: FC = () => {
               <div className='flex-grow-1'>
                 <div className='d-flex justify-content-between align-items-start flex-wrap mb-2'>
                   <div className='d-flex flex-column'>
-                    <div className='d-flex align-items-center mb-2'>
-                      <a href='#' className='text-gray-800 text-hover-primary fs-2 fw-bolder me-1'>
-                        Max Smith
-                      </a>
-                      <a href='#'>
-                        <KTIcon iconName='verify' className='fs-1 text-primary' />
-                      </a>
+                    <div className='d-flex align-items-center mb-2 flex-wrap gap-3'>
+                      <span className='text-gray-800 fs-2 fw-bolder'>{fullName}</span>
+                      {profile?.role && <RoleBadge role={profile.role} />}
                     </div>
 
-                    <div className='d-flex flex-wrap fw-bold fs-6 mb-4 pe-2'>
-                      <a
-                        href='#'
-                        className='d-flex align-items-center text-gray-500 text-hover-primary me-5 mb-2'
-                      >
+                    <div className='d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2'>
+                      <span className='d-flex align-items-center text-gray-600 me-5 mb-2'>
                         <KTIcon iconName='profile-circle' className='fs-4 me-1' />
-                        Developer
-                      </a>
-                      <a
-                        href='#'
-                        className='d-flex align-items-center text-gray-500 text-hover-primary me-5 mb-2'
-                      >
-                        <KTIcon iconName='geolocation' className='fs-4 me-1' />
-                        SF, Bay Area
-                      </a>
-                      <a
-                        href='#'
-                        className='d-flex align-items-center text-gray-500 text-hover-primary mb-2'
-                      >
+                        {profile?.role ?? intl.formatMessage({id: 'PROFILE.HEADER.TEAM_MEMBER'})}
+                      </span>
+                      <span className='d-flex align-items-center text-gray-600 me-5 mb-2'>
+                        <KTIcon iconName='check-circle' className='fs-4 me-1' />
+                        {profile?.status ?? intl.formatMessage({id: 'PROFILE.HEADER.STATUS_UNAVAILABLE'})}
+                      </span>
+                      <span className='d-flex align-items-center text-gray-600 mb-2'>
                         <KTIcon iconName='sms' className='fs-4 me-1' />
-                        max@kt.com
-                      </a>
+                        {email}
+                      </span>
                     </div>
                   </div>
 
                   <div className='d-flex my-4'>
-                    <a href='#' className='btn btn-sm btn-light me-2' id='kt_user_follow_button'>
-                      <KTIcon iconName='check' className='fs-3 d-none' />
-
-                      <span className='indicator-label'>Follow</span>
-                      <span className='indicator-progress'>
-                        Please wait...
-                        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                      </span>
-                    </a>
-                    <a
-                      href='#'
-                      className='btn btn-sm btn-primary me-3'
-                      data-bs-toggle='modal'
-                      data-bs-target='#kt_modal_offer_a_deal'
-                    >
-                      Hire Me
-                    </a>
-                    <div className='me-0'>
-                      <button
-                        className='btn btn-sm btn-icon btn-bg-light btn-active-color-primary'
-                        data-kt-menu-trigger='click'
-                        data-kt-menu-placement='bottom-end'
-                        data-kt-menu-flip='top-end'
-                      >
-                        <i className='bi bi-three-dots fs-3'></i>
-                      </button>
-                      <Dropdown1 />
-                    </div>
+                    <Link to='/user-management' className='btn btn-sm btn-primary'>
+                      {intl.formatMessage({id: 'PROFILE.HEADER.MANAGE_USERS'})}
+                    </Link>
                   </div>
                 </div>
 
@@ -97,43 +88,48 @@ const ProfileHeader: FC = () => {
                     <div className='d-flex flex-wrap'>
                       <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
                         <div className='d-flex align-items-center'>
-                          <KTIcon iconName='arrow-up' className='fs-3 text-success me-2' />
-                          <div className='fs-2 fw-bolder'>4500$</div>
+                          <KTIcon iconName='people' className='fs-3 text-primary me-2' />
+                          <div className='fs-2 fw-bolder'>{users.length}</div>
                         </div>
-
-                        <div className='fw-bold fs-6 text-gray-500'>Earnings</div>
+                        <div className='fw-bold fs-6 text-gray-500'>
+                          {intl.formatMessage({id: 'PROFILE.HEADER.MANAGED_USERS'})}
+                        </div>
                       </div>
 
                       <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
                         <div className='d-flex align-items-center'>
-                          <KTIcon iconName='arrow-down' className='fs-3 text-danger me-2' />
-                          <div className='fs-2 fw-bolder'>75</div>
+                          <KTIcon iconName='security-user' className='fs-3 text-success me-2' />
+                          <div className='fs-2 fw-bolder'>{activeUsers}</div>
                         </div>
-
-                        <div className='fw-bold fs-6 text-gray-500'>Projects</div>
+                        <div className='fw-bold fs-6 text-gray-500'>
+                          {intl.formatMessage({id: 'PROFILE.HEADER.ACTIVE_ACCOUNTS'})}
+                        </div>
                       </div>
 
                       <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
                         <div className='d-flex align-items-center'>
-                          <KTIcon iconName='arrow-up' className='fs-3 text-success me-2' />
-                          <div className='fs-2 fw-bolder'>60%</div>
+                          <KTIcon iconName='shield-tick' className='fs-3 text-info me-2' />
+                          <div className='fs-2 fw-bolder'>{adminUsers}</div>
                         </div>
-
-                        <div className='fw-bold fs-6 text-gray-500'>Success Rate</div>
+                        <div className='fw-bold fs-6 text-gray-500'>
+                          {intl.formatMessage({id: 'PROFILE.HEADER.ADMIN_SEATS'})}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <div className='d-flex align-items-center w-200px w-sm-300px flex-column mt-3'>
                     <div className='d-flex justify-content-between w-100 mt-auto mb-2'>
-                      <span className='fw-bold fs-6 text-gray-500'>Profile Compleation</span>
-                      <span className='fw-bolder fs-6'>50%</span>
+                      <span className='fw-bold fs-6 text-gray-500'>
+                        {intl.formatMessage({id: 'PROFILE.HEADER.READINESS'})}
+                      </span>
+                      <span className='fw-bolder fs-6'>{Math.min(profileCompletion, 100)}%</span>
                     </div>
                     <div className='h-5px mx-3 w-100 bg-light mb-3'>
                       <div
-                        className='bg-success rounded h-5px'
+                        className='bg-primary rounded h-5px'
                         role='progressbar'
-                        style={{width: '50%'}}
+                        style={{width: `${Math.min(profileCompletion, 100)}%`}}
                       ></div>
                     </div>
                   </div>
@@ -151,51 +147,18 @@ const ProfileHeader: FC = () => {
                     }
                     to='/profile/overview'
                   >
-                    Overview
+                    {intl.formatMessage({id: 'PROFILE.NAV.OVERVIEW'})}
                   </Link>
                 </li>
                 <li className='nav-item'>
                   <Link
                     className={
                       `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/projects' && 'active')
+                      (location.pathname === '/profile/social-accounts' && 'active')
                     }
-                    to='/profile/projects'
+                    to='/profile/social-accounts'
                   >
-                    Projects
-                  </Link>
-                </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/campaigns' && 'active')
-                    }
-                    to='/profile/campaigns'
-                  >
-                    Campaigns
-                  </Link>
-                </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/documents' && 'active')
-                    }
-                    to='/profile/documents'
-                  >
-                    Documents
-                  </Link>
-                </li>
-                <li className='nav-item'>
-                  <Link
-                    className={
-                      `nav-link text-active-primary me-6 ` +
-                      (location.pathname === '/profile/connections' && 'active')
-                    }
-                    to='/profile/connections'
-                  >
-                    Connections
+                    {intl.formatMessage({id: 'PROFILE.NAV.SOCIAL_ACCOUNTS'})}
                   </Link>
                 </li>
               </ul>

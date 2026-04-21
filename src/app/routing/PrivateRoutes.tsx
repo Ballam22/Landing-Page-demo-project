@@ -6,6 +6,7 @@ import {DashboardWrapper} from '../pages/dashboard/DashboardWrapper'
 import {getCSSVariableValue} from '../../_metronic/assets/ts/_utils'
 import {WithChildren} from '../../_metronic/helpers'
 import {EmailVerificationBanner} from '../modules/auth/components/EmailVerificationBanner'
+import {RoleGuard} from '../modules/user-management/components/guards/RoleGuard'
 
 const BannerLayout = () => (
   <>
@@ -16,6 +17,7 @@ const BannerLayout = () => (
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
+  const UserManagementPage = lazy(() => import('../modules/user-management/UserManagementPage'))
 
   return (
     <Routes>
@@ -28,6 +30,16 @@ const PrivateRoutes = () => {
             element={
               <SuspensedView>
                 <ProfilePage />
+              </SuspensedView>
+            }
+          />
+          <Route
+            path='user-management'
+            element={
+              <SuspensedView>
+                <RoleGuard allowedRoles={['Admin', 'Manager']}>
+                  <UserManagementPage />
+                </RoleGuard>
               </SuspensedView>
             }
           />

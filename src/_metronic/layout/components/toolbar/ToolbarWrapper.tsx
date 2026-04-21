@@ -3,7 +3,11 @@ import {ToolbarType, useLayout} from '../../core'
 import {Toolbar} from './Toolbar'
 import {PageTitleWrapper} from './page-title'
 
-const ToolbarWrapper = () => {
+type Props = {
+  showActions?: boolean
+}
+
+const ToolbarWrapper = ({showActions = true}: Props) => {
   const {config, classes} = useLayout()
   if (!config.app?.toolbar?.display) {
     return null
@@ -33,7 +37,7 @@ const ToolbarWrapper = () => {
         )}
       >
         {isPageTitleVisible && <PageTitleWrapper />}
-        <Toolbar />
+        <Toolbar showActions={showActions} />
       </div>
     </div>
   )

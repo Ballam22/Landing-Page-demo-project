@@ -1,14 +1,6 @@
 import {FC} from 'react'
 import {Link} from 'react-router-dom'
 import {KTIcon} from '../../../helpers'
-import {Item1} from '../../content/activity/Item1'
-import {Item2} from '../../content/activity/Item2'
-import {Item3} from '../../content/activity/Item3'
-import {Item4} from '../../content/activity/Item4'
-import {Item5} from '../../content/activity/Item5'
-import {Item6} from '../../content/activity/Item6'
-import {Item7} from '../../content/activity/Item7'
-import {Item8} from '../../content/activity/Item8'
 
 const ActivityDrawer: FC = () => (
   <div
@@ -25,7 +17,7 @@ const ActivityDrawer: FC = () => (
   >
     <div className='card shadow-none rounded-0'>
       <div className='card-header' id='kt_activities_header'>
-        <h3 className='card-title fw-bolder text-gray-900'>Activity Logs</h3>
+        <h3 className='card-title fw-bolder text-gray-900'>Activity Log</h3>
 
         <div className='card-toolbar'>
           <button
@@ -37,33 +29,25 @@ const ActivityDrawer: FC = () => (
           </button>
         </div>
       </div>
-      <div className='card-body position-relative' id='kt_activities_body'>
-        <div
-          id='kt_activities_scroll'
-          className='position-relative scroll-y me-n5 pe-5'
-          data-kt-scroll='true'
-          data-kt-scroll-height='auto'
-          data-kt-scroll-wrappers='#kt_activities_body'
-          data-kt-scroll-dependencies='#kt_activities_header, #kt_activities_footer'
-          data-kt-scroll-offset='5px'
-        >
-          <div className='timeline'>
-            <Item1 />
-            <Item2 />
-            <Item3 />
-            <Item4 />
-            <Item5 />
-            <Item6 />
-            <Item7 />
-            <Item8 />
+
+      <div className='card-body d-flex align-items-center justify-content-center min-h-400px'>
+        <div className='text-center mw-400px'>
+          <div className='symbol symbol-75px mx-auto mb-6'>
+            <span className='symbol-label bg-light-warning text-warning'>
+              <KTIcon iconName='time' className='fs-1' />
+            </span>
           </div>
+
+          <div className='fw-bolder text-gray-900 fs-3 mb-3'>No activity recorded</div>
+          <div className='text-muted fs-6 mb-7'>
+            This activity log has been cleared of demo entries. Real account and app events can be
+            added here once an audit trail is wired in.
+          </div>
+
+          <Link to='/dashboard' className='btn btn-light-primary'>
+            Return to dashboard
+          </Link>
         </div>
-      </div>
-      <div className='card-footer py-5 text-center' id='kt_activities_footer'>
-        <Link to='/profile/overview' className='btn btn-bg-body text-primary'>
-          View All Activities
-          <KTIcon iconName='arrow-right' className='fs-3 text-primary' />
-        </Link>
       </div>
     </div>
   </div>

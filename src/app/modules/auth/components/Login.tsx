@@ -3,10 +3,10 @@ import * as Yup from 'yup'
 import clsx from 'clsx'
 import {Link} from 'react-router-dom'
 import {useFormik} from 'formik'
-import {getUserByToken, login} from '../core/_requests'
+import {login} from '../core/_requests'
 import {useAuth} from '../core/Auth'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {isMockAuthError} from '../core/_models'
+import {isAuthFlowError} from '../core/_models'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -28,7 +28,6 @@ const initialValues = {
 export function Login() {
   const intl = useIntl()
   const [loading, setLoading] = useState(false)
-  const [lockoutStatus, setLockoutStatus] = useState<string | null>(null)
   const {saveAuth, setCurrentUser} = useAuth()
 
   const formik = useFormik({
@@ -36,24 +35,15 @@ export function Login() {
     validationSchema: loginSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
-      setLockoutStatus(null)
       try {
-        const {data: auth} = await login(values.email, values.password)
+        const {auth, user} = await login(values.email, values.password)
         saveAuth(auth)
-        const {data: user} = await getUserByToken(auth.api_token)
         setCurrentUser(user)
       } catch (error) {
         console.error(error)
         saveAuth(undefined)
-        if (isMockAuthError(error) && error.type === 'lockout') {
-          const unlockTime = error.resetAt
-            ? new Date(error.resetAt).toLocaleTimeString()
-            : ''
-          setLockoutStatus(
-            intl.formatMessage({id: 'AUTH.LOCKOUT.MESSAGE'}) +
-              ' ' +
-              intl.formatMessage({id: 'AUTH.LOCKOUT.UNLOCK_TIME'}, {time: unlockTime})
-          )
+        if (isAuthFlowError(error) && error.type === 'email_not_confirmed') {
+          setStatus(intl.formatMessage({id: 'AUTH.LOGIN.EMAIL_NOT_CONFIRMED'}))
         } else {
           setStatus(intl.formatMessage({id: 'AUTH.LOGIN.INVALID_CREDENTIALS'}))
         }
@@ -78,13 +68,7 @@ export function Login() {
       </div>
       {/* end::Heading */}
 
-      {lockoutStatus && (
-        <div className='mb-lg-15 alert alert-danger'>
-          <div className='alert-text font-weight-bold'>{lockoutStatus}</div>
-        </div>
-      )}
-
-      {formik.status && !lockoutStatus && (
+      {formik.status && (
         <div className='mb-lg-15 alert alert-danger'>
           <div className='alert-text font-weight-bold'>{formik.status}</div>
         </div>

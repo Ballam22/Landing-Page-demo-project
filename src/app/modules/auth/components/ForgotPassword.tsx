@@ -5,7 +5,6 @@ import {Link} from 'react-router-dom'
 import {useFormik} from 'formik'
 import {requestPassword} from '../core/_requests'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {isMockAuthError} from '../core/_models'
 
 const initialValues = {
   email: '',
@@ -23,8 +22,6 @@ export function ForgotPassword() {
   const intl = useIntl()
   const [loading, setLoading] = useState(false)
   const [hasErrors, setHasErrors] = useState<boolean | undefined>(undefined)
-  const [rateLimited, setRateLimited] = useState(false)
-  const [demoToken, setDemoToken] = useState<string | undefined>(undefined)
 
   const formik = useFormik({
     initialValues,
@@ -32,24 +29,14 @@ export function ForgotPassword() {
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
       setHasErrors(undefined)
-      setRateLimited(false)
-      setDemoToken(undefined)
       try {
-        const {data} = await requestPassword(values.email)
+        await requestPassword(values.email)
         setHasErrors(false)
-        if (data.token) {
-          setDemoToken(data.token)
-        }
         setLoading(false)
       } catch (error) {
         console.error(error)
-        if (isMockAuthError(error) && error.type === 'rate_limit') {
-          setRateLimited(true)
-          setHasErrors(undefined)
-        } else {
-          setHasErrors(true)
-          setStatus(intl.formatMessage({id: 'AUTH.FORGOT.SUCCESS'}))
-        }
+        setHasErrors(true)
+        setStatus(intl.formatMessage({id: 'AUTH.FORGOT.SUCCESS'}))
         setLoading(false)
         setSubmitting(false)
       }
@@ -72,14 +59,6 @@ export function ForgotPassword() {
         </div>
       </div>
 
-      {rateLimited && (
-        <div className='mb-lg-15 alert alert-warning'>
-          <div className='alert-text font-weight-bold'>
-            <FormattedMessage id='AUTH.RATE_LIMIT.MESSAGE' />
-          </div>
-        </div>
-      )}
-
       {hasErrors === true && (
         <div className='mb-lg-15 alert alert-danger'>
           <div className='alert-text font-weight-bold'>
@@ -93,15 +72,6 @@ export function ForgotPassword() {
           <div className='text-info'>
             <FormattedMessage id='AUTH.FORGOT.SUCCESS' />
           </div>
-          {demoToken && (
-            <div className='mt-3'>
-              <small className='text-muted'>
-                <FormattedMessage id='AUTH.RESET.DEMO_TOKEN_LABEL' />
-              </small>
-              <br />
-              <code className='text-break'>{demoToken}</code>
-            </div>
-          )}
         </div>
       )}
 

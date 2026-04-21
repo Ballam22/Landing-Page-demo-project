@@ -1,8 +1,9 @@
 
 import clsx from 'clsx'
 import {FC} from 'react'
+import {useIntl} from 'react-intl'
 import {toAbsoluteUrl} from '../../../helpers'
-import {useLang, setLanguage} from '../../../i18n/Metronici18n'
+import {useLang, useSetLang} from '../../../i18n/Metronici18n'
 
 const languages = [
   {
@@ -11,34 +12,16 @@ const languages = [
     flag: toAbsoluteUrl('media/flags/united-states.svg'),
   },
   {
-    lang: 'zh',
-    name: 'Mandarin',
-    flag: toAbsoluteUrl('media/flags/china.svg'),
-  },
-  {
-    lang: 'es',
-    name: 'Spanish',
-    flag: toAbsoluteUrl('media/flags/spain.svg'),
-  },
-  {
-    lang: 'ja',
-    name: 'Japanese',
-    flag: toAbsoluteUrl('media/flags/japan.svg'),
-  },
-  {
     lang: 'de',
-    name: 'German',
+    name: 'Deutsch',
     flag: toAbsoluteUrl('media/flags/germany.svg'),
-  },
-  {
-    lang: 'fr',
-    name: 'French',
-    flag: toAbsoluteUrl('media/flags/france.svg'),
   },
 ]
 
 const Languages: FC = () => {
+  const intl = useIntl()
   const lang = useLang()
+  const setLang = useSetLang()
   const currentLanguage = languages.find((x) => x.lang === lang)
   return (
     <div
@@ -49,7 +32,7 @@ const Languages: FC = () => {
     >
       <a href='#' className='menu-link px-5'>
         <span className='menu-title position-relative'>
-          Language
+          {intl.formatMessage({id: 'TRANSLATOR.SELECT'})}
           <span className='fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0'>
             {currentLanguage?.name}{' '}
             <img
@@ -63,16 +46,14 @@ const Languages: FC = () => {
 
       <div className='menu-sub menu-sub-dropdown w-175px py-4'>
         {languages.map((l) => (
-          <div
-            className='menu-item px-3'
-            key={l.lang}
-            onClick={() => {
-              setLanguage(l.lang)
-            }}
-          >
+          <div className='menu-item px-3' key={l.lang}>
             <a
               href='#'
               className={clsx('menu-link d-flex px-5', {active: l.lang === currentLanguage?.lang})}
+              onClick={(e) => {
+                e.preventDefault()
+                setLang(l.lang as 'en' | 'de')
+              }}
             >
               <span className='symbol symbol-20px me-4'>
                 <img className='rounded-1' src={l.flag} alt='metronic' />

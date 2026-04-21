@@ -1,124 +1,200 @@
 import {FC} from 'react'
+import {Link} from 'react-router-dom'
 import {useIntl} from 'react-intl'
-import {toAbsoluteUrl} from '../../../_metronic/helpers'
 import {PageTitle} from '../../../_metronic/layout/core'
-import {
-  ListsWidget2,
-  ListsWidget3,
-  ListsWidget4,
-  ListsWidget6,
-  TablesWidget5,
-  TablesWidget10,
-  MixedWidget8,
-  CardsWidget7,
-  CardsWidget17,
-  CardsWidget20,
-  ListsWidget26,
-  EngageWidget10,
-} from '../../../_metronic/partials/widgets'
-import { ToolbarWrapper } from '../../../_metronic/layout/components/toolbar'
-import { Content } from '../../../_metronic/layout/components/content'
+import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
+import {Content} from '../../../_metronic/layout/components/content'
+import {useAuth} from '../../modules/auth'
+import {useUserController} from '../../modules/user-management/controller/useUserController'
 
-const DashboardPage: FC = () => (
-  <>
-    <ToolbarWrapper />
-    <Content>
-    {/* begin::Row */}
-    <div className='row g-5 g-xl-10 mb-5 mb-xl-10'>
-      {/* begin::Col */}
-      <div className='col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10'>
-        <CardsWidget20
-          className='h-md-50 mb-5 mb-xl-10'
-          description='Active Projects'
-          color='#F1416C'
-          img={toAbsoluteUrl('media/patterns/vector-1.png')}
-        />
-        <CardsWidget7
-          className='h-md-50 mb-5 mb-xl-10'
-          description='Professionals'
-          icon={false}
-          stats={357}
-          labelColor='dark'
-          textColor='gray-300'
-        />
-      </div>
-      {/* end::Col */}
+const DashboardPage: FC = () => {
+  const intl = useIntl()
+  const {currentUser} = useAuth()
+  const {users, isLoading, error} = useUserController()
 
-      {/* begin::Col */}
-      <div className='col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10'>
-        <CardsWidget17 className='h-md-50 mb-5 mb-xl-10' />
-        <ListsWidget26 className='h-lg-50' />
-      </div>
-      {/* end::Col */}
+  const activeUsers = users.filter((user) => user.status === 'Active').length
+  const adminUsers = users.filter((user) => user.role === 'Admin').length
+  const managerUsers = users.filter((user) => user.role === 'Manager').length
+  const recentUsers = users.slice(0, 5)
+  const displayName =
+    currentUser?.fullname?.trim() ||
+    [currentUser?.first_name, currentUser?.last_name].filter(Boolean).join(' ').trim() ||
+    currentUser?.email ||
+    'there'
 
-      {/* begin::Col */}
-      <div className='col-xxl-6'>
-        <EngageWidget10 className='h-md-100' />
-      </div>
-      {/* end::Col */}
-    </div>
-    {/* end::Row */}
+  return (
+    <>
+      <ToolbarWrapper showActions={false} />
+      <Content>
+        <div className='row g-5 g-xl-8'>
+          <div className='col-12'>
+            <div className='card border-0 shadow-sm'>
+              <div className='card-body p-8'>
+                <div className='d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-6'>
+                  <div>
+                    <div className='fs-6 fw-semibold text-gray-600 mb-2'>
+                      {intl.formatMessage({id: 'DASHBOARD.OVERVIEW'})}
+                    </div>
+                    <h1 className='fs-2hx fw-bold text-gray-900 mb-3'>
+                      {intl.formatMessage({id: 'DASHBOARD.WELCOME_BACK'}, {name: displayName})}
+                    </h1>
+                    <div className='fs-5 text-gray-700 mw-lg-600'>
+                      {intl.formatMessage({id: 'DASHBOARD.DESCRIPTION'})}
+                    </div>
+                  </div>
 
-    {/* begin::Row */}
-    <div className='row gx-5 gx-xl-10'>
-      {/* begin::Col */}
-      <div className='col-xxl-6 mb-5 mb-xl-10'>
-        {/* <app-new-charts-widget8 cssclassName="h-xl-100" chartHeight="275px" [chartHeightNumber]="275"></app-new-charts-widget8> */}
-      </div>
-      {/* end::Col */}
+                  <div className='d-flex flex-wrap gap-3'>
+                    <Link to='/user-management' className='btn btn-primary'>
+                      {intl.formatMessage({id: 'DASHBOARD.OPEN_USER_MANAGEMENT'})}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      {/* begin::Col */}
-      <div className='col-xxl-6 mb-5 mb-xl-10'>
-        {/* <app-cards-widget18 cssclassName="h-xl-100" image="./assetsmedia/stock/600x600/img-65.jpg"></app-cards-widget18> */}
-      </div>
-      {/* end::Col */}
-    </div>
-    {/* end::Row */}
+          <div className='col-md-6 col-xl-3'>
+            <div className='card h-100 border-0 shadow-sm'>
+              <div className='card-body p-6'>
+                <div className='fs-7 fw-semibold text-uppercase text-gray-600 mb-2'>
+                  {intl.formatMessage({id: 'DASHBOARD.TOTAL_USERS'})}
+                </div>
+                <div className='fs-1 fw-bold text-gray-900'>
+                  {isLoading ? '--' : users.length}
+                </div>
+              </div>
+            </div>
+          </div>
 
-    {/* begin::Row */}
-    <div className='row gy-5 gx-xl-8'>
-      <div className='col-xxl-4'>
-        <ListsWidget3 className='card-xxl-stretch mb-xl-3' />
-      </div>
-      <div className='col-xl-8'>
-        <TablesWidget10 className='card-xxl-stretch mb-5 mb-xl-8' />
-      </div>
-    </div>
-    {/* end::Row */}
+          <div className='col-md-6 col-xl-3'>
+            <div className='card h-100 border-0 shadow-sm'>
+              <div className='card-body p-6'>
+                <div className='fs-7 fw-semibold text-uppercase text-gray-600 mb-2'>
+                  {intl.formatMessage({id: 'DASHBOARD.ACTIVE_USERS'})}
+                </div>
+                <div className='fs-1 fw-bold text-success'>
+                  {isLoading ? '--' : activeUsers}
+                </div>
+              </div>
+            </div>
+          </div>
 
-    {/* begin::Row */}
-    <div className='row gy-5 g-xl-8'>
-      <div className='col-xl-4'>
-        <ListsWidget2 className='card-xl-stretch mb-xl-8' />
-      </div>
-      <div className='col-xl-4'>
-        <ListsWidget6 className='card-xl-stretch mb-xl-8' />
-      </div>
-      <div className='col-xl-4'>
-        <ListsWidget4 className='card-xl-stretch mb-5 mb-xl-8' items={5} />
-        {/* partials/widgets/lists/_widget-4', 'class' => 'card-xl-stretch mb-5 mb-xl-8', 'items' => '5' */}
-      </div>
-    </div>
-    {/* end::Row */}
+          <div className='col-md-6 col-xl-3'>
+            <div className='card h-100 border-0 shadow-sm'>
+              <div className='card-body p-6'>
+                <div className='fs-7 fw-semibold text-uppercase text-gray-600 mb-2'>
+                  {intl.formatMessage({id: 'DASHBOARD.ADMINS'})}
+                </div>
+                <div className='fs-1 fw-bold text-gray-900'>
+                  {isLoading ? '--' : adminUsers}
+                </div>
+              </div>
+            </div>
+          </div>
 
-    <div className='row g-5 gx-xxl-8'>
-      <div className='col-xxl-4'>
-        <MixedWidget8
-          className='card-xxl-stretch mb-xl-3'
-          chartColor='success'
-          chartHeight='150px'
-        />
-      </div>
-      <div className='col-xxl-8'>
-        <TablesWidget5 className='card-xxl-stretch mb-5 mb-xxl-8' />
-      </div>
-    </div>
-    </Content>
-  </>
-)
+          <div className='col-md-6 col-xl-3'>
+            <div className='card h-100 border-0 shadow-sm'>
+              <div className='card-body p-6'>
+                <div className='fs-7 fw-semibold text-uppercase text-gray-600 mb-2'>
+                  {intl.formatMessage({id: 'DASHBOARD.MANAGERS'})}
+                </div>
+                <div className='fs-1 fw-bold text-gray-900'>
+                  {isLoading ? '--' : managerUsers}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='col-12'>
+            <div className='card border-0 shadow-sm'>
+              <div className='card-header border-0 pt-6'>
+                <div className='card-title'>
+                  <h2 className='fw-bold'>{intl.formatMessage({id: 'DASHBOARD.RECENT_USERS'})}</h2>
+                </div>
+              </div>
+
+              <div className='card-body pt-0'>
+                {isLoading && (
+                  <div className='py-10 text-center text-gray-600'>
+                    {intl.formatMessage({id: 'DASHBOARD.LOADING_USERS'})}
+                  </div>
+                )}
+
+                {error && (
+                  <div className='alert alert-danger mb-0'>
+                    {(error as Error)?.message || intl.formatMessage({id: 'DASHBOARD.LOAD_ERROR'})}
+                  </div>
+                )}
+
+                {!isLoading && !error && recentUsers.length === 0 && (
+                  <div className='py-10 text-center'>
+                    <div className='fs-4 fw-semibold text-gray-800 mb-2'>
+                      {intl.formatMessage({id: 'DASHBOARD.NO_USERS_TITLE'})}
+                    </div>
+                    <div className='text-gray-600 mb-5'>
+                      {intl.formatMessage({id: 'DASHBOARD.NO_USERS_DESCRIPTION'})}
+                    </div>
+                    <Link to='/user-management' className='btn btn-light-primary'>
+                      {intl.formatMessage({id: 'DASHBOARD.ADD_USERS'})}
+                    </Link>
+                  </div>
+                )}
+
+                {!isLoading && !error && recentUsers.length > 0 && (
+                  <div className='table-responsive'>
+                    <table className='table align-middle gs-0 gy-4'>
+                      <thead>
+                        <tr className='fw-bold text-muted bg-light'>
+                          <th className='ps-4 min-w-250px rounded-start'>
+                            {intl.formatMessage({id: 'DASHBOARD.TABLE_USER'})}
+                          </th>
+                          <th className='min-w-150px'>{intl.formatMessage({id: 'DASHBOARD.TABLE_ROLE'})}</th>
+                          <th className='min-w-125px'>{intl.formatMessage({id: 'DASHBOARD.TABLE_STATUS'})}</th>
+                          <th className='min-w-200px rounded-end'>
+                            {intl.formatMessage({id: 'DASHBOARD.TABLE_EMAIL'})}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentUsers.map((user) => (
+                          <tr key={user.id}>
+                            <td className='ps-4'>
+                              <div className='d-flex flex-column'>
+                                <span className='text-gray-900 fw-bold fs-6'>{user.fullName}</span>
+                                <span className='text-muted fw-semibold fs-7'>{user.id}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <span className='badge badge-light-primary'>{user.role}</span>
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  user.status === 'Active' ? 'badge-light-success' : 'badge-light-secondary'
+                                }`}
+                              >
+                                {user.status}
+                              </span>
+                            </td>
+                            <td className='text-gray-700 fw-semibold'>{user.email}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Content>
+    </>
+  )
+}
 
 const DashboardWrapper: FC = () => {
   const intl = useIntl()
+
   return (
     <>
       <PageTitle breadcrumbs={[]}>{intl.formatMessage({id: 'MENU.DASHBOARD'})}</PageTitle>

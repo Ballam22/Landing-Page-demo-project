@@ -9,7 +9,11 @@ import {
   ToolbarSaas,
 } from './toolbars'
 
-const Toolbar = () => {
+type Props = {
+  showActions?: boolean
+}
+
+const Toolbar = ({showActions = true}: Props) => {
   const {config} = useLayout()
   useEffect(() => {
     updateDOM(config)
@@ -18,7 +22,7 @@ const Toolbar = () => {
 
   switch (config.app?.toolbar?.layout) {
     case 'classic':
-      return <ToolbarClassic />
+      return <ToolbarClassic showActions={showActions} />
     case 'accounting':
       return <ToolbarAccounting />
     case 'extended':
