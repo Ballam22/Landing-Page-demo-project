@@ -58,6 +58,79 @@ export const mapSupabaseUserToUserModel = (user: User): UserModel => {
   }
 }
 
+const getUserFullName = (user: User) => {
+  const metadata = user.user_metadata as Record<string, unknown> | null
+  const explicitFullName =
+    typeof metadata?.full_name === 'string' ? metadata.full_name.trim() : ''
+  if (explicitFullName) {
+    return explicitFullName
+  }
+
+  const firstName =
+    typeof metadata?.first_name === 'string' ? metadata.first_name.trim() : ''
+  const lastName =
+    typeof metadata?.last_name === 'string' ? metadata.last_name.trim() : ''
+  const combinedName = [firstName, lastName].filter(Boolean).join(' ').trim()
+  if (combinedName) {
+    return combinedName
+  }
+
+  const email = user.email ?? ''
+  return email.split('@')[0] || 'User'
+}
+
+async function ensureUserProfile(user: User): Promise<void> {
+  const email = user.email?.trim().toLowerCase()
+  if (!email) {
+    return
+  }
+
+  const fullName = getUserFullName(user)
+  const {data: existingProfile, error: lookupError} = await supabase
+    .from('users')
+    .select('id, email')
+    .eq('email', email)
+    .maybeSingle()
+
+  if (lookupError) {
+    console.error('Unable to look up user profile row', lookupError)
+    return
+  }
+
+  if (existingProfile) {
+    const updatePayload: {id?: string; full_name: string; email: string} = {
+      full_name: fullName,
+      email,
+    }
+
+    if (existingProfile.id !== user.id) {
+      updatePayload.id = user.id
+    }
+
+    const {error: updateError} = await supabase
+      .from('users')
+      .update(updatePayload)
+      .eq('email', email)
+
+    if (updateError) {
+      console.error('Unable to update existing user profile row', updateError)
+    }
+    return
+  }
+
+  const {error: insertError} = await supabase.from('users').insert({
+    id: user.id,
+    full_name: fullName,
+    email,
+    role: 'User',
+    status: 'Active',
+  })
+
+  if (insertError) {
+    console.error('Unable to create user profile row', insertError)
+  }
+}
+
 export async function login(email: string, password: string): Promise<LoginResult> {
   const {data, error} = await supabase.auth.signInWithPassword({email, password})
 
@@ -76,6 +149,8 @@ export async function login(email: string, password: string): Promise<LoginResul
   if (!data.session || !data.user) {
     throw createAuthError('invalid_credentials', 'Unable to create a valid session.')
   }
+
+  await ensureUserProfile(data.user)
 
   return {
     auth: mapSessionToAuthModel(data.session),
@@ -109,6 +184,10 @@ export async function register(
     }
 
     throw error
+  }
+
+  if (data.user && data.session) {
+    await ensureUserProfile(data.user)
   }
 
   return {
@@ -159,6 +238,8 @@ export async function getUserByToken(_token?: string): Promise<{data: UserModel}
   if (!data.user) {
     throw createAuthError('invalid_credentials', 'No authenticated user was found.')
   }
+
+  await ensureUserProfile(data.user)
 
   return {data: mapSupabaseUserToUserModel(data.user)}
 }
