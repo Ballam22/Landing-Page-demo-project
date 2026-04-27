@@ -9,6 +9,8 @@ import {UserModal} from './components/UserModal'
 import {DeleteConfirmDialog} from './components/DeleteConfirmDialog'
 import {useUserDetailDrawer} from './controller/useUserDetailDrawer'
 import {UserDetailDrawer} from './components/UserDetailDrawer'
+import {useUserController} from './controller/useUserController'
+import '../blog-management/BlogManagement.css'
 
 const EMPTY_FORM_VALUES: UserFormValues = {
   fullName: '',
@@ -41,6 +43,7 @@ const userToFormValues = (user: User): UserFormValues => ({
 const UserManagementContent: FC = () => {
   const intl = useIntl()
   const {currentUserId, deleteUser} = useUserManagement()
+  const {users} = useUserController()
   const {selectedDetailUser, isOpen, openDrawer, closeDrawer} = useUserDetailDrawer()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -88,31 +91,77 @@ const UserManagementContent: FC = () => {
 
   const modalInitialValues = selectedUser ? userToFormValues(selectedUser) : EMPTY_FORM_VALUES
   const modalMode = selectedUser ? 'edit' : 'add'
+  const activeUsers = users.filter((user) => user.status === 'Active').length
+  const admins = users.filter((user) => user.role === 'Admin').length
+  const managers = users.filter((user) => user.role === 'Manager').length
 
   return (
-    <>
-      <div className='d-flex justify-content-between align-items-center mb-7'>
-        <h1 className='fw-bolder text-dark'>
-          {intl.formatMessage({id: 'USER_MANAGEMENT.TITLE'})}
-        </h1>
-        <button
-          type='button'
-          className='btn btn-primary'
-          onClick={handleAddUser}
-        >
-          <i className='ki-duotone ki-plus fs-3 me-1'>
-            <span className='path1'></span>
-            <span className='path2'></span>
-          </i>
-          {intl.formatMessage({id: 'USER_MANAGEMENT.ADD_USER'})}
-        </button>
+    <div className='blog-management-shell'>
+      <div className='blog-management-header'>
+        <div className='blog-management-header-content'>
+          <div>
+            <div className='blog-management-kicker'>
+              {intl.formatMessage({id: 'USER_MANAGEMENT.HEADER_KICKER'})}
+            </div>
+            <h1 className='blog-management-title'>
+              {intl.formatMessage({id: 'USER_MANAGEMENT.TITLE'})}
+            </h1>
+            <p className='blog-management-subtitle'>
+              {intl.formatMessage({id: 'USER_MANAGEMENT.HEADER_SUBTITLE'})}
+            </p>
+          </div>
+          <button type='button' className='btn btn-lg' onClick={handleAddUser}>
+            <i className='ki-duotone ki-plus fs-3 me-1'>
+              <span className='path1'></span>
+              <span className='path2'></span>
+            </i>
+            {intl.formatMessage({id: 'USER_MANAGEMENT.ADD_USER'})}
+          </button>
+        </div>
+      </div>
+
+      <div className='blog-management-stats'>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'USER_MANAGEMENT.STAT_TOTAL'})}
+          </div>
+          <div className='blog-management-stat-value'>{users.length}</div>
+          <div className='blog-management-stat-accent info' />
+        </div>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'USER_MANAGEMENT.STAT_ACTIVE'})}
+          </div>
+          <div className='blog-management-stat-value'>{activeUsers}</div>
+          <div className='blog-management-stat-accent success' />
+        </div>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'USER_MANAGEMENT.STAT_ADMINS'})}
+          </div>
+          <div className='blog-management-stat-value'>{admins}</div>
+          <div className='blog-management-stat-accent warning' />
+        </div>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'USER_MANAGEMENT.STAT_MANAGERS'})}
+          </div>
+          <div className='blog-management-stat-value'>{managers}</div>
+          <div className='blog-management-stat-accent danger' />
+        </div>
       </div>
 
       {deleteError && (
         <div className='alert alert-danger mb-4'>{deleteError}</div>
       )}
 
-      <div className='card'>
+      <div className='card blog-management-card'>
+        <div className='card-header border-0 pt-6'>
+          <div className='card-title blog-management-card-title'>
+            <h2>{intl.formatMessage({id: 'USER_MANAGEMENT.TABLE_TITLE'})}</h2>
+            <span>{intl.formatMessage({id: 'USER_MANAGEMENT.TABLE_SUBTITLE'})}</span>
+          </div>
+        </div>
         <div className='card-body py-4'>
           <UsersTable
             currentUserId={currentUserId}
@@ -140,7 +189,7 @@ const UserManagementContent: FC = () => {
       />
 
       <UserDetailDrawer user={selectedDetailUser} isOpen={isOpen} onClose={closeDrawer} />
-    </>
+    </div>
   )
 }
 

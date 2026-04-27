@@ -1,7 +1,8 @@
-import {FC, useEffect, useRef} from 'react'
+import {FC, useEffect, useRef, useState} from 'react'
 import {useIntl} from 'react-intl'
-import {useThread, useSendMessage} from '../controller/useMessageController'
+import {useThread, useSendMessage, useDeleteMessage} from '../controller/useMessageController'
 import {User} from '../../user-management/model/User'
+import {Message} from '../model/Message'
 import {MessageBubble} from './MessageBubble'
 import {MessageInput} from './MessageInput'
 
@@ -15,7 +16,10 @@ const MessageThread: FC<Props> = ({currentUserId, otherUser, allUsers}) => {
   const intl = useIntl()
   const {data: messages = [], isLoading, error} = useThread(currentUserId, otherUser.id)
   const sendMessage = useSendMessage()
+  const deleteMessage = useDeleteMessage()
   const bottomRef = useRef<HTMLDivElement>(null)
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({behavior: 'smooth'})
@@ -27,6 +31,30 @@ const MessageThread: FC<Props> = ({currentUserId, otherUser, allUsers}) => {
       recipientId: otherUser.id,
       body,
     })
+  }
+
+  const handleDelete = async (message: Message) => {
+    if (!window.confirm('Delete this message from the inbox?')) {
+      return
+    }
+
+    try {
+      setDeletingMessageId(message.id)
+      setDeleteError(null)
+      await deleteMessage.mutateAsync({
+        userId: currentUserId,
+        otherUserId: otherUser.id,
+        messageId: message.id,
+      })
+    } catch (deleteFailure) {
+      setDeleteError(
+        deleteFailure instanceof Error && deleteFailure.message
+          ? deleteFailure.message
+          : 'Could not delete this message.'
+      )
+    } finally {
+      setDeletingMessageId(null)
+    }
   }
 
   return (
@@ -50,6 +78,8 @@ const MessageThread: FC<Props> = ({currentUserId, otherUser, allUsers}) => {
           </div>
         )}
 
+        {deleteError && <div className='alert alert-danger py-3'>{deleteError}</div>}
+
         {!isLoading && !error && messages.length === 0 && (
           <div className='d-flex align-items-center justify-content-center h-100 text-muted'>
             {intl.formatMessage({id: 'MESSAGES.EMPTY_THREAD'})}
@@ -67,6 +97,8 @@ const MessageThread: FC<Props> = ({currentUserId, otherUser, allUsers}) => {
               message={message}
               isMine={isMine}
               senderUser={senderUser}
+              isDeleting={deletingMessageId === message.id}
+              onDelete={handleDelete}
             />
           )
         })}

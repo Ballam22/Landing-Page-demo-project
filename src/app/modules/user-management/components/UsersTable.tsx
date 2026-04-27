@@ -152,7 +152,7 @@ const UsersTable: FC<Props> = ({currentUserId, selectedDetailUserId, onEdit, onD
   }
 
   return (
-    <div className='table-responsive'>
+    <div className='table-responsive blog-management-table'>
       <table
         className='table align-middle table-row-dashed fs-6 gy-5'
         {...getTableProps()}

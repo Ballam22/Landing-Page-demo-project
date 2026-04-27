@@ -19,6 +19,7 @@ const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import('../modules/profile/ProfilePage'))
   const UserManagementPage = lazy(() => import('../modules/user-management/UserManagementPage'))
   const MessagesPage = lazy(() => import('../modules/messages/components/MessagesPage'))
+  const BlogManagementPage = lazy(() => import('../modules/blog-management/BlogManagementPage'))
 
   return (
     <Routes>
@@ -49,6 +50,16 @@ const PrivateRoutes = () => {
             element={
               <SuspensedView>
                 <MessagesPage />
+              </SuspensedView>
+            }
+          />
+          <Route
+            path='blog-management/*'
+            element={
+              <SuspensedView>
+                <RoleGuard allowedRoles={['Admin', 'Manager']}>
+                  <BlogManagementPage />
+                </RoleGuard>
               </SuspensedView>
             }
           />

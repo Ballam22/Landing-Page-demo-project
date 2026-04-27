@@ -24,9 +24,9 @@ description: "Task list for User Management — Supabase Migration"
 **Purpose**: Environment verification and SQL schema — unblocks all user stories.
 
 - [x] T001 Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in `.env` and that `src/app/lib/supabaseClient.ts` exports a working client
-- [ ] T002 Run the `users` table migration in Supabase SQL editor (SQL from `specs/003-user-management-supabase/data-model.md`)
-- [ ] T003 Create the `avatars` Storage bucket in Supabase Dashboard (public visibility)
-- [ ] T004 Seed at least one Admin user row in `public.users` matching the Supabase auth UID (see `specs/003-user-management-supabase/quickstart.md` Step 3)
+- [x] T002 Run the `users` table migration in Supabase SQL editor (SQL from `specs/003-user-management-supabase/data-model.md`)
+- [x] T003 Create the `avatars` Storage bucket in Supabase Dashboard (public visibility)
+- [x] T004 Seed at least one Admin user row in `public.users` matching the Supabase auth UID (see `specs/003-user-management-supabase/quickstart.md` Step 3)
 
 **Checkpoint**: Supabase table exists, bucket exists, env vars set — implementation can begin.
 

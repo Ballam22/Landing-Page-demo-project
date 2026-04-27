@@ -8,6 +8,7 @@ import {useAuth} from '../auth'
 import {getInitials, useCurrentProfile} from '../../hooks/useCurrentProfile'
 import {useUserController} from '../user-management/controller/useUserController'
 import {RoleBadge} from '../user-management/components/RoleBadge'
+import '../blog-management/BlogManagement.css'
 
 const ProfileHeader: FC = () => {
   const intl = useIntl()
@@ -32,7 +33,24 @@ const ProfileHeader: FC = () => {
     <>
       <ToolbarWrapper showActions={false} />
       <Content>
-        <div className='card mb-5 mb-xl-10'>
+        <div className='blog-management-header mb-5'>
+          <div className='blog-management-header-content'>
+            <div>
+              <div className='blog-management-kicker'>
+                {intl.formatMessage({id: 'PROFILE.HEADER.KICKER'})}
+              </div>
+              <h1 className='blog-management-title'>{fullName}</h1>
+              <p className='blog-management-subtitle'>
+                {intl.formatMessage({id: 'PROFILE.HEADER.SUBTITLE'}, {email})}
+              </p>
+            </div>
+            <Link to='/user-management' className='btn btn-lg'>
+              {intl.formatMessage({id: 'PROFILE.HEADER.MANAGE_USERS'})}
+            </Link>
+          </div>
+        </div>
+
+        <div className='card blog-management-card mb-5 mb-xl-10'>
           <div className='card-body pt-9 pb-0'>
             <div className='d-flex flex-wrap flex-sm-nowrap mb-3'>
               <div className='me-7 mb-4'>
@@ -75,18 +93,12 @@ const ProfileHeader: FC = () => {
                       </span>
                     </div>
                   </div>
-
-                  <div className='d-flex my-4'>
-                    <Link to='/user-management' className='btn btn-sm btn-primary'>
-                      {intl.formatMessage({id: 'PROFILE.HEADER.MANAGE_USERS'})}
-                    </Link>
-                  </div>
                 </div>
 
                 <div className='d-flex flex-wrap flex-stack'>
                   <div className='d-flex flex-column flex-grow-1 pe-8'>
                     <div className='d-flex flex-wrap'>
-                      <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
+                      <div className='blog-management-stat min-w-125px py-3 px-4 me-6 mb-3'>
                         <div className='d-flex align-items-center'>
                           <KTIcon iconName='people' className='fs-3 text-primary me-2' />
                           <div className='fs-2 fw-bolder'>{users.length}</div>
@@ -96,7 +108,7 @@ const ProfileHeader: FC = () => {
                         </div>
                       </div>
 
-                      <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
+                      <div className='blog-management-stat min-w-125px py-3 px-4 me-6 mb-3'>
                         <div className='d-flex align-items-center'>
                           <KTIcon iconName='security-user' className='fs-3 text-success me-2' />
                           <div className='fs-2 fw-bolder'>{activeUsers}</div>
@@ -106,7 +118,7 @@ const ProfileHeader: FC = () => {
                         </div>
                       </div>
 
-                      <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
+                      <div className='blog-management-stat min-w-125px py-3 px-4 me-6 mb-3'>
                         <div className='d-flex align-items-center'>
                           <KTIcon iconName='shield-tick' className='fs-3 text-info me-2' />
                           <div className='fs-2 fw-bolder'>{adminUsers}</div>

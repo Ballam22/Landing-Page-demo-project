@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# TinyMCE self-hosted assets (installed via npm, not committed)
+/public/tinymce
+
 # Local AI/dev tools (may contain credentials)
 .opencode/
 .claude/

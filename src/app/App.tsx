@@ -5,6 +5,7 @@ import {LayoutProvider, LayoutSplashScreen} from '../_metronic/layout/core'
 import {MasterInit} from '../_metronic/layout/MasterInit'
 import {AuthInit} from './modules/auth'
 import {ThemeModeProvider} from '../_metronic/partials'
+import {ConsentBanner} from './modules/consent'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
             <AuthInit>
               <Outlet />
               <MasterInit />
+              <ConsentBanner />
             </AuthInit>
           </ThemeModeProvider>
         </LayoutProvider>

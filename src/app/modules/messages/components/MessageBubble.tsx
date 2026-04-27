@@ -1,6 +1,7 @@
 import {FC} from 'react'
 import clsx from 'clsx'
 import {useIntl} from 'react-intl'
+import {KTIcon} from '../../../../_metronic/helpers'
 import {Message} from '../model/Message'
 import {User} from '../../user-management/model/User'
 import {getInitials} from '../../../hooks/useCurrentProfile'
@@ -9,9 +10,11 @@ type Props = {
   message: Message
   isMine: boolean
   senderUser: User | undefined
+  isDeleting?: boolean
+  onDelete?: (message: Message) => void
 }
 
-const MessageBubble: FC<Props> = ({message, isMine, senderUser}) => {
+const MessageBubble: FC<Props> = ({message, isMine, senderUser, isDeleting = false, onDelete}) => {
   const intl = useIntl()
 
   const timestamp = new Intl.DateTimeFormat(intl.locale, {
@@ -55,13 +58,31 @@ const MessageBubble: FC<Props> = ({message, isMine, senderUser}) => {
             {message.body}
           </div>
         </div>
-        <div
-          className={clsx('fs-8 text-muted mt-1', {
-            'text-end': isMine,
-            'text-start': !isMine,
-          })}
-        >
-          {timestamp}
+        <div className='d-flex align-items-center gap-2 mt-1'>
+          {isMine && <div className='flex-grow-1' />}
+          <div
+            className={clsx('fs-8 text-muted', {
+              'text-end': isMine,
+              'text-start': !isMine,
+            })}
+          >
+            {timestamp}
+          </div>
+          {onDelete && (
+            <button
+              type='button'
+              className='btn btn-icon btn-sm btn-light-danger w-25px h-25px'
+              title='Delete message'
+              disabled={isDeleting}
+              onClick={() => onDelete(message)}
+            >
+              {isDeleting ? (
+                <span className='spinner-border spinner-border-sm' />
+              ) : (
+                <KTIcon iconName='trash' className='fs-7' />
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>

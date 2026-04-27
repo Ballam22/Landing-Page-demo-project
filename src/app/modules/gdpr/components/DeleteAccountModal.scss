@@ -1,0 +1,200 @@
+// GDPR Components Styles
+
+.delete-account-modal,
+.delete-account-step {
+  .warning-icon,
+  .success-icon,
+  .processing-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .alert-danger {
+    ul {
+      padding-left: 1.5rem;
+      margin-bottom: 0;
+
+      li {
+        margin-bottom: 0.25rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .form-control {
+    border-radius: 6px;
+    border: 1px solid #e1e5e9;
+
+    &:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+  }
+
+  .btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+
+    &.btn-danger {
+      background: #dc3545;
+      border-color: #dc3545;
+
+      &:hover:not(:disabled) {
+        background: #c82333;
+        border-color: #bd2130;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+      }
+    }
+
+    &.btn-outline-primary {
+      border-color: #0d6efd;
+      color: #0d6efd;
+
+      &:hover:not(:disabled) {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+      }
+    }
+  }
+
+  .alert {
+    border-radius: 8px;
+    border: none;
+
+    &.alert-danger {
+      background: rgba(220, 53, 69, 0.1);
+      color: #721c24;
+    }
+
+    &.alert-info {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0c5460;
+    }
+  }
+
+  .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem 2rem;
+
+    .modal-title {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .btn-close {
+      margin: 0;
+    }
+  }
+
+  .modal-body {
+    padding: 2rem;
+  }
+}
+
+// Responsive design
+@media (max-width: 576px) {
+  .delete-account-modal .modal-dialog {
+    margin: 1rem;
+    max-width: none;
+  }
+
+  .delete-account-step .modal-body {
+    padding: 1.5rem;
+  }
+
+  .delete-account-step .d-flex.gap-3 {
+    flex-direction: column;
+
+    .btn {
+      margin-bottom: 0.5rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .delete-account-modal {
+    .modal-content {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .modal-header {
+      border-bottom-color: #333;
+    }
+
+    .alert-danger {
+      background: rgba(220, 53, 69, 0.2);
+      color: #ea868f;
+    }
+
+    .alert-info {
+      background: rgba(13, 110, 253, 0.2);
+      color: #6ea8fe;
+    }
+
+    .form-control {
+      background: #2d3748;
+      border-color: #4a5568;
+      color: #fff;
+
+      &::placeholder {
+        color: #a0aec0;
+      }
+
+      &:focus {
+        border-color: #63b3ed;
+        box-shadow: 0 0 0 0.2rem rgba(99, 179, 237, 0.25);
+      }
+    }
+
+    .btn-close {
+      filter: invert(1);
+    }
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: more) {
+  .delete-account-modal {
+    .modal-content {
+      border: 2px solid #000;
+    }
+
+    .btn {
+      border-width: 2px;
+    }
+
+    .alert {
+      border: 2px solid currentColor;
+    }
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .delete-account-modal .btn {
+    transition: none;
+  }
+}

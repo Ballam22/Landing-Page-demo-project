@@ -82,3 +82,35 @@ export function useMarkAsRead() {
     }
   )
 }
+
+export function useDeleteMessage() {
+  const queryClient = useQueryClient()
+  return useMutation(
+    ({
+      userId,
+      messageId,
+    }: {
+      userId: string
+      otherUserId: string
+      messageId: string
+    }) => messageRepository.deleteMessage(userId, messageId),
+    {
+      onSuccess: (_result, variables) => {
+        queryClient.invalidateQueries([MESSAGE_QUERY_KEY, 'all', variables.userId])
+        queryClient.invalidateQueries([MESSAGE_QUERY_KEY, 'all', variables.otherUserId])
+        queryClient.invalidateQueries([
+          MESSAGE_QUERY_KEY,
+          'thread',
+          variables.userId,
+          variables.otherUserId,
+        ])
+        queryClient.invalidateQueries([
+          MESSAGE_QUERY_KEY,
+          'thread',
+          variables.otherUserId,
+          variables.userId,
+        ])
+      },
+    }
+  )
+}

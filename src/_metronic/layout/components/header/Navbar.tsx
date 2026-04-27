@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import {useQuery} from 'react-query'
 import {KTIcon} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
@@ -6,6 +7,7 @@ import {UserAvatarButton} from '../../../../app/components/UserAvatarButton'
 import {useAuth} from '../../../../app/modules/auth'
 import {useCurrentProfile} from '../../../../app/hooks/useCurrentProfile'
 import {useUnreadCount} from '../../../../app/modules/messages/controller/useMessageController'
+import {getAllBlogs} from '../../../../app/modules/blog-management/blog-posts/repository/blogRepository'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
@@ -17,6 +19,11 @@ const Navbar = () => {
   const {currentUser} = useAuth()
   const {data: profile} = useCurrentProfile(currentUser?.email)
   const {data: unreadCount = 0} = useUnreadCount(profile?.id)
+  const {data: blogs = []} = useQuery(['blogs'], getAllBlogs, {
+    staleTime: 0,
+    refetchInterval: 15_000,
+  })
+  const publishedBlogCount = blogs.filter((blog) => blog.status === 'Published').length
 
   return (
     <div className='app-navbar flex-shrink-0'>
@@ -35,9 +42,14 @@ const Navbar = () => {
           data-kt-menu-trigger="{default: 'click'}"
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
-          className={btnClass}
+          className={clsx('position-relative', btnClass)}
         >
-          <KTIcon iconName='element-plus' className={btnIconClass} />
+          <KTIcon iconName='notification-bing' className={btnIconClass} />
+          {publishedBlogCount > 0 && (
+            <span className='badge badge-circle badge-success position-absolute top-0 start-100 translate-middle fs-8'>
+              {publishedBlogCount > 99 ? '99+' : publishedBlogCount}
+            </span>
+          )}
         </div>
         <HeaderNotificationsMenu />
       </div>

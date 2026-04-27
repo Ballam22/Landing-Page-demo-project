@@ -6,6 +6,7 @@ import {useUserController} from '../../user-management/controller/useUserControl
 import {useConversations, useMarkAsRead} from '../controller/useMessageController'
 import {ConversationList} from './ConversationList'
 import {MessageThread} from './MessageThread'
+import '../../blog-management/BlogManagement.css'
 
 const MessagesPage = () => {
   const intl = useIntl()
@@ -37,30 +38,85 @@ const MessagesPage = () => {
   }
 
   const selectedUser = activeUsersExcludingSelf.find((u) => u.id === selectedUserId) ?? null
+  const unreadCount = conversations.reduce((sum, conversation) => sum + conversation.unreadCount, 0)
 
   return (
-    <div className='d-flex h-100' style={{minHeight: '600px'}}>
-      <ConversationList
-        conversations={conversations}
-        users={activeUsersExcludingSelf}
-        selectedUserId={selectedUserId}
-        onSelect={handleSelect}
-        onNewConversation={() => setPicker(true)}
-        isLoading={isLoading}
-      />
-
-      <div className='flex-grow-1 d-flex flex-column'>
-        {!selectedUser ? (
-          <div className='flex-grow-1 d-flex align-items-center justify-content-center text-muted'>
-            {intl.formatMessage({id: 'MESSAGES.EMPTY_THREAD'})}
+    <div className='blog-management-shell'>
+      <div className='blog-management-header'>
+        <div className='blog-management-header-content'>
+          <div>
+            <div className='blog-management-kicker'>
+              {intl.formatMessage({id: 'MESSAGES.HEADER_KICKER'})}
+            </div>
+            <h1 className='blog-management-title'>
+              {intl.formatMessage({id: 'MESSAGES.PAGE_TITLE'})}
+            </h1>
+            <p className='blog-management-subtitle'>
+              {intl.formatMessage({id: 'MESSAGES.SUBTITLE'})}
+            </p>
           </div>
-        ) : (
-          <MessageThread
-            currentUserId={currentUserId!}
-            otherUser={selectedUser}
-            allUsers={activeUsersExcludingSelf}
+          <button type='button' className='btn btn-lg' onClick={() => setPicker(true)}>
+            {intl.formatMessage({id: 'MESSAGES.NEW_MESSAGE'})}
+          </button>
+        </div>
+      </div>
+
+      <div className='blog-management-stats'>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'MESSAGES.STAT_CONVERSATIONS'})}
+          </div>
+          <div className='blog-management-stat-value'>{conversations.length}</div>
+          <div className='blog-management-stat-accent info' />
+        </div>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'MESSAGES.STAT_RECIPIENTS'})}
+          </div>
+          <div className='blog-management-stat-value'>{activeUsersExcludingSelf.length}</div>
+          <div className='blog-management-stat-accent success' />
+        </div>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'MESSAGES.STAT_UNREAD'})}
+          </div>
+          <div className='blog-management-stat-value'>{unreadCount}</div>
+          <div className='blog-management-stat-accent warning' />
+        </div>
+        <div className='blog-management-stat'>
+          <div className='blog-management-stat-label'>
+            {intl.formatMessage({id: 'MESSAGES.STAT_SELECTED'})}
+          </div>
+          <div className='blog-management-stat-value'>{selectedUser ? 1 : 0}</div>
+          <div className='blog-management-stat-accent danger' />
+        </div>
+      </div>
+
+      <div className='card blog-management-card overflow-hidden'>
+        <div className='d-flex h-100 messages-polished-shell'>
+          <ConversationList
+            conversations={conversations}
+            users={activeUsersExcludingSelf}
+            selectedUserId={selectedUserId}
+            onSelect={handleSelect}
+            onNewConversation={() => setPicker(true)}
+            isLoading={isLoading}
           />
-        )}
+
+          <div className='flex-grow-1 d-flex flex-column'>
+            {!selectedUser ? (
+              <div className='flex-grow-1 d-flex align-items-center justify-content-center text-muted'>
+                {intl.formatMessage({id: 'MESSAGES.EMPTY_THREAD'})}
+              </div>
+            ) : (
+              <MessageThread
+                currentUserId={currentUserId!}
+                otherUser={selectedUser}
+                allUsers={activeUsersExcludingSelf}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       {pickerOpen && (

@@ -7,6 +7,7 @@ import {useCurrentProfile} from '../../../app/hooks/useCurrentProfile'
 import {ConversationSummary} from '../../../app/modules/messages/model/Message'
 import {
   useConversations,
+  useDeleteMessage,
   useMarkAsRead,
   useThread,
   useSendMessage,
@@ -32,6 +33,8 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
   const [draft, setDraft] = useState('')
   const [sendSuccess, setSendSuccess] = useState<string | null>(null)
   const [sendError, setSendError] = useState<string | null>(null)
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const availableUsers = useMemo(
     () => users.filter((user) => user.id !== profile?.id && user.status === 'Active'),
@@ -101,6 +104,7 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
     error: conversationError,
   } = useThread(profile?.id, selectedUserId || undefined)
   const sendMessageMutation = useSendMessage()
+  const deleteMessageMutation = useDeleteMessage()
   const markConversationAsReadMutation = useMarkAsRead()
   const unreadIncomingCount = useMemo(
     () =>
@@ -155,6 +159,28 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
           ? error.message
           : intl.formatMessage({id: 'MESSAGES.SEND_ERROR'})
       )
+    }
+  }
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!profile?.id || !selectedUserId || !window.confirm('Delete this message from the inbox?')) {
+      return
+    }
+
+    try {
+      setDeletingMessageId(messageId)
+      setDeleteError(null)
+      await deleteMessageMutation.mutateAsync({
+        userId: profile.id,
+        otherUserId: selectedUserId,
+        messageId,
+      })
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error && error.message ? error.message : 'Could not delete this message.'
+      )
+    } finally {
+      setDeletingMessageId(null)
     }
   }
 
@@ -321,7 +347,24 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
                           })}
                         >
                           <div className='fs-6'>{message.body}</div>
-                          <div className='fs-8 text-muted mt-2'>{formatTimestamp(message.createdAt)}</div>
+                          <div className='d-flex align-items-center gap-2 mt-2'>
+                            <div className='fs-8 text-muted'>
+                              {formatTimestamp(message.createdAt)}
+                            </div>
+                            <button
+                              type='button'
+                              className='btn btn-icon btn-sm btn-light-danger w-25px h-25px'
+                              title='Delete message'
+                              disabled={deletingMessageId === message.id}
+                              onClick={() => handleDeleteMessage(message.id)}
+                            >
+                              {deletingMessageId === message.id ? (
+                                <span className='spinner-border spinner-border-sm' />
+                              ) : (
+                                <KTIcon iconName='trash' className='fs-7' />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )
@@ -332,6 +375,7 @@ const ChatInner: FC<Props> = ({isDrawer = false}) => {
               {sendMessageMutation.isError && (
                 <div className='alert alert-danger py-3'>{sendError ?? intl.formatMessage({id: 'MESSAGES.SEND_ERROR'})}</div>
               )}
+              {deleteError && <div className='alert alert-danger py-3'>{deleteError}</div>}
             </div>
           )}
         </div>

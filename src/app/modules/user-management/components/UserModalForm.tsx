@@ -18,6 +18,59 @@ const ROLES: Role[] = ['Admin', 'Manager', 'User']
 const STATUSES: Status[] = ['Active', 'Inactive']
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_SIZE = 5 * 1024 * 1024
+const AVATAR_FILES = [
+  '001-boy.svg',
+  '002-girl.svg',
+  '003-girl-1.svg',
+  '004-boy-1.svg',
+  '005-girl-2.svg',
+  '006-girl-3.svg',
+  '007-boy-2.svg',
+  '008-boy-3.svg',
+  '009-boy-4.svg',
+  '010-girl-4.svg',
+  '011-boy-5.svg',
+  '012-girl-5.svg',
+  '013-girl-6.svg',
+  '014-girl-7.svg',
+  '015-boy-6.svg',
+  '016-boy-7.svg',
+  '017-girl-8.svg',
+  '018-girl-9.svg',
+  '019-girl-10.svg',
+  '020-girl-11.svg',
+  '021-boy-8.svg',
+  '022-girl-12.svg',
+  '023-girl-13.svg',
+  '024-boy-9.svg',
+  '025-girl-14.svg',
+  '026-boy-10.svg',
+  '027-girl-15.svg',
+  '028-girl-16.svg',
+  '029-boy-11.svg',
+  '030-girl-17.svg',
+  '031-boy-12.svg',
+  '032-boy-13.svg',
+  '033-girl-18.svg',
+  '034-boy-14.svg',
+  '035-boy-15.svg',
+  '036-girl-19.svg',
+  '037-girl-20.svg',
+  '038-boy-16.svg',
+  '039-girl-21.svg',
+  '040-boy-17.svg',
+  '041-girl-22.svg',
+  '042-girl-23.svg',
+  '043-boy-18.svg',
+  '044-boy-19.svg',
+  '045-boy-20.svg',
+  '046-girl-24.svg',
+  '047-girl-25.svg',
+  '048-boy-21.svg',
+  '049-boy-22.svg',
+  '050-girl-26.svg',
+]
+const AVATAR_OPTIONS = AVATAR_FILES.map((file) => `${import.meta.env.BASE_URL}media/svg/avatars/${file}`)
 const SOCIAL_PLATFORMS: Array<{key: SocialPlatform; label: string; placeholder: string}> = [
   {key: 'linkedin', label: 'LinkedIn', placeholder: 'https://www.linkedin.com/in/username'},
   {key: 'instagram', label: 'Instagram', placeholder: 'https://www.instagram.com/username'},
@@ -226,6 +279,12 @@ const UserModalForm: FC<Props> = ({mode, userId, initialValues, existingEmails, 
     formik.setFieldValue('avatarUrl', previewUrl)
   }
 
+  const handleAvatarSelect = (avatarUrl: string | undefined) => {
+    setAvatarError(null)
+    formik.setFieldValue('avatarFile', null)
+    formik.setFieldValue('avatarUrl', avatarUrl)
+  }
+
   const avatarPreview = formik.values.avatarUrl
 
   return (
@@ -278,6 +337,41 @@ const UserModalForm: FC<Props> = ({mode, userId, initialValues, existingEmails, 
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          <div className='mt-5'>
+            <div className='d-flex align-items-center justify-content-between mb-3'>
+              <div className='fw-bold fs-7 text-gray-700'>
+                {intl.formatMessage({id: 'USER_MANAGEMENT.AVATAR_LIBRARY'})}
+              </div>
+              <button
+                type='button'
+                className='btn btn-sm btn-light'
+                onClick={() => handleAvatarSelect(undefined)}
+                disabled={formik.isSubmitting}
+              >
+                {intl.formatMessage({id: 'USER_MANAGEMENT.USE_INITIALS'})}
+              </button>
+            </div>
+            <div className='avatar-picker-grid'>
+              {AVATAR_OPTIONS.map((avatarUrl) => (
+                <button
+                  key={avatarUrl}
+                  type='button'
+                  className={clsx('avatar-picker-option', {
+                    active: formik.values.avatarUrl === avatarUrl,
+                  })}
+                  onClick={() => handleAvatarSelect(avatarUrl)}
+                  disabled={formik.isSubmitting}
+                  aria-label={intl.formatMessage({id: 'USER_MANAGEMENT.CHOOSE_AVATAR'})}
+                >
+                  <img src={avatarUrl} alt='' />
+                </button>
+              ))}
+            </div>
+            <div className='form-text text-muted mt-2'>
+              {intl.formatMessage({id: 'USER_MANAGEMENT.AVATAR_LIBRARY_HINT'})}
             </div>
           </div>
         </div>

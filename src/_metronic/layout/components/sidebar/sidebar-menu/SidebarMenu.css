@@ -1,0 +1,82 @@
+#kt_app_sidebar {
+  background:
+    linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(20, 83, 45, 0.92)),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.18), rgba(245, 158, 11, 0.12), rgba(56, 189, 248, 0.14));
+}
+
+#kt_app_sidebar .app-sidebar-logo {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#kt_app_sidebar .menu {
+  padding-top: 0.5rem;
+}
+
+#kt_app_sidebar .menu-item {
+  padding: 0 0.7rem;
+}
+
+#kt_app_sidebar .menu-link.without-sub {
+  position: relative;
+  margin: 0.18rem 0;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.72);
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+#kt_app_sidebar .menu-link.without-sub::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0.45rem;
+  width: 4px;
+  height: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #22c55e, #f59e0b, #38bdf8);
+  transform: translateY(-50%);
+  transition: height 0.16s ease;
+}
+
+#kt_app_sidebar .menu-link.without-sub .menu-title,
+#kt_app_sidebar .menu-link.without-sub .menu-icon,
+#kt_app_sidebar .menu-link.without-sub i {
+  color: inherit;
+}
+
+#kt_app_sidebar .menu-link.without-sub:hover,
+#kt_app_sidebar .menu-link.without-sub.active {
+  background: rgba(255, 255, 255, 0.11);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+#kt_app_sidebar .menu-link.without-sub.active {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+#kt_app_sidebar .menu-link.without-sub:hover::before,
+#kt_app_sidebar .menu-link.without-sub.active::before {
+  height: 58%;
+}
+
+#kt_app_sidebar .menu-link.without-sub.active .menu-icon,
+#kt_app_sidebar .menu-link.without-sub.active i {
+  color: #a7f3d0;
+}
+
+#kt_app_sidebar .menu-link.without-sub .menu-title {
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .menu-item {
+  padding: 0 0.55rem;
+}
+
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .menu-link.without-sub {
+  justify-content: center;
+}
+
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .menu-link.without-sub::before {
+  left: 0.25rem;
+}

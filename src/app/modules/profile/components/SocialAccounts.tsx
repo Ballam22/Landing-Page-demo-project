@@ -191,7 +191,7 @@ export function SocialAccounts() {
     <Content>
       <div className='row g-5 g-xxl-8'>
         <div className='col-xxl-4'>
-          <div className='card h-100'>
+          <div className='card blog-management-card h-100'>
             <div className='card-body p-8'>
               <div className='fs-2hx fw-bolder text-gray-900 mb-2'>{connectedCount}/3</div>
               <div className='fs-5 fw-semibold text-gray-700 mb-4'>
@@ -230,7 +230,7 @@ export function SocialAccounts() {
         </div>
 
         <div className='col-xxl-8'>
-          <div className='card'>
+          <div className='card blog-management-card'>
             <div className='card-header border-0 pt-6'>
               <div className='card-title flex-column align-items-start'>
                 <h3 className='fw-bolder mb-1'>{intl.formatMessage({id: 'PROFILE.SOCIAL.TITLE'})}</h3>
