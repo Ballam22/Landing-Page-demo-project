@@ -77,16 +77,17 @@ export function BlogsTable({onEdit, onDelete}: BlogsTableProps) {
       {
         Header: intl.formatMessage({id: 'BLOG_MANAGEMENT.COL_TITLE'}),
         accessor: 'title',
-        Cell: ({value}) => <span className='fw-bold'>{value}</span>,
+        Cell: ({value}) => <span className='fw-bold blog-table-primary-text'>{value}</span>,
       },
       {
         Header: intl.formatMessage({id: 'BLOG_MANAGEMENT.COL_SLUG'}),
         accessor: 'slug',
-        Cell: ({value}) => <code className='text-muted'>{value}</code>,
+        Cell: ({value}) => <code className='blog-table-code'>{value}</code>,
       },
       {
         Header: intl.formatMessage({id: 'BLOG_MANAGEMENT.COL_CATEGORY'}),
         accessor: 'categoryName',
+        Cell: ({value}) => <span className='blog-table-primary-text'>{value}</span>,
       },
       {
         Header: intl.formatMessage({id: 'BLOG_MANAGEMENT.COL_STATUS'}),

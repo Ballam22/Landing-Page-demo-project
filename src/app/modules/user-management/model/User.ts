@@ -1,5 +1,6 @@
 export type Role = 'Admin' | 'Manager' | 'User'
 export type Status = 'Active' | 'Inactive'
+export type PresenceStatus = 'Available' | 'Idle' | 'Busy'
 
 export type SocialPlatform = 'linkedin' | 'instagram' | 'x'
 
@@ -22,6 +23,7 @@ export type User = {
   email: string
   role: Role
   status: Status
+  presenceStatus: PresenceStatus
   avatarUrl?: string
   socialLinks: SocialLinks
 }
@@ -31,6 +33,7 @@ export type UserFormValues = {
   email: string
   role: Role
   status: Status
+  presenceStatus: PresenceStatus
   avatarFile: File | null
   avatarUrl?: string
   socialLinks: SocialLinks

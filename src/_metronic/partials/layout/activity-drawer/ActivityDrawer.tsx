@@ -29,7 +29,7 @@ const ActivityDrawer: FC = () => {
       data-kt-drawer-name='activities'
       data-kt-drawer-activate='true'
       data-kt-drawer-overlay='true'
-      data-kt-drawer-width="{default:'300px', 'lg': '900px'}"
+      data-kt-drawer-width="{default:'300px', 'sm': '360px', 'lg': '380px'}"
       data-kt-drawer-direction='end'
       data-kt-drawer-toggle='#kt_activities_toggle'
       data-kt-drawer-close='#kt_activities_close'
@@ -79,16 +79,14 @@ const ActivityDrawer: FC = () => {
           )}
 
           {!isLoading && publishedBlogs.length > 0 && (
-            <div className='timeline-label'>
+            <div className='d-flex flex-column gap-4'>
               {publishedBlogs.map((blog) => (
-                <div className='timeline-item' key={blog.id}>
-                  <div className='timeline-label fw-bolder text-gray-800 fs-6'>
-                    {formatActivityDate(blog.updatedAt || blog.createdAt)}
-                  </div>
-                  <div className='timeline-badge'>
-                    <i className='fa fa-genderless text-success fs-1'></i>
-                  </div>
-                  <div className='timeline-content d-flex flex-column ps-3'>
+                <div className='d-flex gap-3' key={blog.id}>
+                  <span className='badge badge-circle badge-success mt-1 flex-shrink-0' />
+                  <div className='d-flex flex-column min-w-0'>
+                    <div className='text-muted fs-8 mb-1'>
+                      {formatActivityDate(blog.updatedAt || blog.createdAt)}
+                    </div>
                     <Link
                       to='/blog-management/blogs'
                       className='fw-bolder text-gray-900 text-hover-primary fs-5 mb-1'

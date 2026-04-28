@@ -1,9 +1,16 @@
 import {useState} from 'react'
 import {useIntl} from 'react-intl'
+import {PageTitle} from '../../../../_metronic/layout/core'
+import {Content} from '../../../../_metronic/layout/components/content'
+import {ToolbarWrapper} from '../../../../_metronic/layout/components/toolbar'
 import {useAuth} from '../../auth'
 import {useCurrentProfile} from '../../../hooks/useCurrentProfile'
 import {useUserController} from '../../user-management/controller/useUserController'
-import {useConversations, useMarkAsRead} from '../controller/useMessageController'
+import {
+  useConversations,
+  useDeleteConversation,
+  useMarkAsRead,
+} from '../controller/useMessageController'
 import {ConversationList} from './ConversationList'
 import {MessageThread} from './MessageThread'
 import '../../blog-management/BlogManagement.css'
@@ -22,9 +29,12 @@ const MessagesPage = () => {
 
   const conversations = conversationsData?.conversations ?? []
   const markAsRead = useMarkAsRead()
+  const deleteConversation = useDeleteConversation()
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [pickerOpen, setPicker] = useState(false)
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const activeUsersExcludingSelf = users.filter(
     (u) => u.status === 'Active' && u.id !== currentUserId
@@ -37,12 +47,39 @@ const MessagesPage = () => {
     }
   }
 
+  const handleDeleteConversation = async (userId: string) => {
+    if (!currentUserId || !window.confirm('Delete this conversation from your inbox?')) {
+      return
+    }
+
+    try {
+      setDeletingUserId(userId)
+      setDeleteError(null)
+      await deleteConversation.mutateAsync({userId: currentUserId, otherUserId: userId})
+      if (selectedUserId === userId) {
+        setSelectedUserId(null)
+      }
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Could not delete this conversation.'
+      )
+    } finally {
+      setDeletingUserId(null)
+    }
+  }
+
   const selectedUser = activeUsersExcludingSelf.find((u) => u.id === selectedUserId) ?? null
   const unreadCount = conversations.reduce((sum, conversation) => sum + conversation.unreadCount, 0)
 
   return (
-    <div className='blog-management-shell'>
-      <div className='blog-management-header'>
+    <>
+      <PageTitle>{intl.formatMessage({id: 'MESSAGES.PAGE_TITLE'})}</PageTitle>
+      <ToolbarWrapper showActions={false} />
+      <Content>
+        <div className='blog-management-shell'>
+          <div className='blog-management-header'>
         <div className='blog-management-header-content'>
           <div>
             <div className='blog-management-kicker'>
@@ -55,9 +92,6 @@ const MessagesPage = () => {
               {intl.formatMessage({id: 'MESSAGES.SUBTITLE'})}
             </p>
           </div>
-          <button type='button' className='btn btn-lg' onClick={() => setPicker(true)}>
-            {intl.formatMessage({id: 'MESSAGES.NEW_MESSAGE'})}
-          </button>
         </div>
       </div>
 
@@ -93,14 +127,17 @@ const MessagesPage = () => {
       </div>
 
       <div className='card blog-management-card overflow-hidden'>
+        {deleteError && <div className='alert alert-danger m-5 mb-0'>{deleteError}</div>}
         <div className='d-flex h-100 messages-polished-shell'>
           <ConversationList
             conversations={conversations}
             users={activeUsersExcludingSelf}
             selectedUserId={selectedUserId}
             onSelect={handleSelect}
+            onDelete={handleDeleteConversation}
             onNewConversation={() => setPicker(true)}
             isLoading={isLoading}
+            deletingUserId={deletingUserId}
           />
 
           <div className='flex-grow-1 d-flex flex-column'>
@@ -119,71 +156,74 @@ const MessagesPage = () => {
         </div>
       </div>
 
+        </div>
+      </Content>
+
       {pickerOpen && (
-        <div
-          className='modal fade show d-block'
-          style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
-          onClick={() => setPicker(false)}
-        >
-          <div className='modal-dialog modal-dialog-centered' onClick={(e) => e.stopPropagation()}>
-            <div className='modal-content'>
-              <div className='modal-header'>
-                <h5 className='modal-title'>
-                  {intl.formatMessage({id: 'MESSAGES.SELECT_RECIPIENT'})}
-                </h5>
-                <button
-                  type='button'
-                  className='btn-close'
-                  onClick={() => setPicker(false)}
-                />
-              </div>
-              <div className='modal-body p-0'>
-                {activeUsersExcludingSelf.length === 0 ? (
-                  <div className='text-center text-muted py-6'>
-                    {intl.formatMessage({id: 'MESSAGES.NO_RECIPIENTS'})}
-                  </div>
-                ) : (
-                  activeUsersExcludingSelf.map((user) => (
+            <div
+              className='modal fade show d-block'
+              style={{backgroundColor: 'rgba(0,0,0,0.5)'}}
+              onClick={() => setPicker(false)}
+            >
+              <div className='modal-dialog modal-dialog-centered' onClick={(e) => e.stopPropagation()}>
+                <div className='modal-content'>
+                  <div className='modal-header'>
+                    <h5 className='modal-title'>
+                      {intl.formatMessage({id: 'MESSAGES.SELECT_RECIPIENT'})}
+                    </h5>
                     <button
-                      key={user.id}
                       type='button'
-                      className='btn btn-flush d-flex align-items-center gap-3 w-100 text-start px-5 py-3 border-bottom border-gray-200'
-                      onClick={() => {
-                        handleSelect(user.id)
-                        setPicker(false)
-                      }}
-                    >
-                      <span className='symbol symbol-40px'>
-                        {user.avatarUrl ? (
-                          <img
-                            src={user.avatarUrl}
-                            alt={user.fullName}
-                            className='symbol-label rounded-circle'
-                          />
-                        ) : (
-                          <span className='symbol-label bg-light-primary text-primary fw-bold fs-6'>
-                            {user.fullName
-                              .split(' ')
-                              .map((p) => p[0] ?? '')
-                              .join('')
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </span>
-                        )}
-                      </span>
-                      <div>
-                        <div className='fw-bold text-gray-900'>{user.fullName}</div>
-                        <div className='text-muted fs-7'>{user.email}</div>
+                      className='btn-close'
+                      onClick={() => setPicker(false)}
+                    />
+                  </div>
+                  <div className='modal-body p-0'>
+                    {activeUsersExcludingSelf.length === 0 ? (
+                      <div className='text-center text-muted py-6'>
+                        {intl.formatMessage({id: 'MESSAGES.NO_RECIPIENTS'})}
                       </div>
-                    </button>
-                  ))
-                )}
+                    ) : (
+                      activeUsersExcludingSelf.map((user) => (
+                        <button
+                          key={user.id}
+                          type='button'
+                          className='btn btn-flush d-flex align-items-center gap-3 w-100 text-start px-5 py-3 border-bottom border-gray-200'
+                          onClick={() => {
+                            handleSelect(user.id)
+                            setPicker(false)
+                          }}
+                        >
+                          <span className='symbol symbol-40px'>
+                            {user.avatarUrl ? (
+                              <img
+                                src={user.avatarUrl}
+                                alt={user.fullName}
+                                className='symbol-label rounded-circle'
+                              />
+                            ) : (
+                              <span className='symbol-label bg-light-primary text-primary fw-bold fs-6'>
+                                {user.fullName
+                                  .split(' ')
+                                  .map((p) => p[0] ?? '')
+                                  .join('')
+                                  .toUpperCase()
+                                  .slice(0, 2)}
+                              </span>
+                            )}
+                          </span>
+                          <div>
+                            <div className='fw-bold text-gray-900'>{user.fullName}</div>
+                            <div className='text-muted fs-7'>{user.email}</div>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+          )}
+    </>
   )
 }
 

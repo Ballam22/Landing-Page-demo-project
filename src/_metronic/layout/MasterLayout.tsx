@@ -1,7 +1,6 @@
 import {useEffect} from 'react'
 import {Outlet, useLocation} from 'react-router-dom'
 import {HeaderWrapper} from './components/header'
-import {RightToolbar} from '../partials/layout/RightToolbar'
 import {ScrollTop} from './components/scroll-top'
 import {FooterWrapper} from './components/footer'
 import {Sidebar} from './components/sidebar'
@@ -13,6 +12,7 @@ const MasterLayout = () => {
   const location = useLocation()
   useEffect(() => {
     reInitMenu()
+    window.scrollTo({top: 0, left: 0, behavior: 'auto'})
   }, [location.key])
 
   return (
@@ -34,7 +34,6 @@ const MasterLayout = () => {
 
       {/* begin:: Drawers */}
       <ActivityDrawer />
-      <RightToolbar />
       <DrawerMessenger />
       {/* end:: Drawers */}
 

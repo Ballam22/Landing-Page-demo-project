@@ -8,6 +8,72 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+#kt_app_sidebar .orbit-cms-logo {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  text-decoration: none;
+}
+
+#kt_app_sidebar .orbit-cms-logo-default {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+#kt_app_sidebar .orbit-cms-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid rgba(110, 231, 183, 0.32);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(6, 78, 59, 0.82), rgba(14, 116, 144, 0.72)),
+    rgba(15, 23, 42, 0.82);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+}
+
+#kt_app_sidebar .orbit-cms-mark svg {
+  width: 23px;
+  height: 23px;
+  overflow: visible;
+}
+
+#kt_app_sidebar .orbit-cms-core {
+  fill: #6ee7b7;
+}
+
+#kt_app_sidebar .orbit-cms-ring {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+
+#kt_app_sidebar .orbit-cms-ring-main {
+  stroke: rgba(248, 250, 252, 0.78);
+}
+
+#kt_app_sidebar .orbit-cms-ring-alt {
+  stroke: rgba(56, 189, 248, 0.78);
+}
+
+#kt_app_sidebar .orbit-cms-satellite {
+  fill: #f59e0b;
+}
+
+#kt_app_sidebar .orbit-cms-wordmark {
+  color: #f8fafc;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 #kt_app_sidebar .menu {
   padding-top: 0.5rem;
 }
@@ -45,13 +111,13 @@
 
 #kt_app_sidebar .menu-link.without-sub:hover,
 #kt_app_sidebar .menu-link.without-sub.active {
-  background: rgba(255, 255, 255, 0.11);
-  color: #fff;
+  background: rgba(52, 211, 153, 0.14);
+  color: #f8fafc;
   transform: translateX(2px);
 }
 
 #kt_app_sidebar .menu-link.without-sub.active {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 10px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(110, 231, 183, 0.22), 0 10px 24px rgba(0, 0, 0, 0.12);
 }
 
 #kt_app_sidebar .menu-link.without-sub:hover::before,
@@ -61,7 +127,7 @@
 
 #kt_app_sidebar .menu-link.without-sub.active .menu-icon,
 #kt_app_sidebar .menu-link.without-sub.active i {
-  color: #a7f3d0;
+  color: #6ee7b7;
 }
 
 #kt_app_sidebar .menu-link.without-sub .menu-title {
@@ -71,6 +137,20 @@
 
 [data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .menu-item {
   padding: 0 0.55rem;
+}
+
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .orbit-cms-logo-default {
+  display: inline-flex !important;
+}
+
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .orbit-cms-wordmark {
+  display: none;
+}
+
+[data-kt-app-sidebar-hoverable='true'][data-kt-app-sidebar-minimize='on']
+  #kt_app_sidebar:hover:not(.animating)
+  .orbit-cms-wordmark {
+  display: inline;
 }
 
 [data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .menu-link.without-sub {

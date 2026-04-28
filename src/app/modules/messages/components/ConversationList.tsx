@@ -10,8 +10,10 @@ type Props = {
   users: User[]
   selectedUserId: string | null
   onSelect: (userId: string) => void
+  onDelete: (userId: string) => void
   onNewConversation: () => void
   isLoading: boolean
+  deletingUserId?: string | null
 }
 
 const ConversationList: FC<Props> = ({
@@ -19,8 +21,10 @@ const ConversationList: FC<Props> = ({
   users,
   selectedUserId,
   onSelect,
+  onDelete,
   onNewConversation,
   isLoading,
+  deletingUserId = null,
 }) => {
   const intl = useIntl()
 
@@ -74,6 +78,8 @@ const ConversationList: FC<Props> = ({
                 user={user}
                 isSelected={selectedUserId === summary.userId}
                 onClick={() => onSelect(summary.userId)}
+                onDelete={() => onDelete(summary.userId)}
+                isDeleting={deletingUserId === summary.userId}
               />
             )
           })}

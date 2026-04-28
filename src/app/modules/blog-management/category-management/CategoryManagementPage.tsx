@@ -88,10 +88,6 @@ function CategoryManagementContent() {
               {intl.formatMessage({id: 'CATEGORY_MANAGEMENT.HEADER_SUBTITLE'})}
             </p>
           </div>
-          <button className='btn btn-lg' onClick={handleAdd}>
-            <i className='ki-duotone ki-plus fs-2' />
-            {intl.formatMessage({id: 'CATEGORY_MANAGEMENT.ADD_CATEGORY'})}
-          </button>
         </div>
       </div>
 

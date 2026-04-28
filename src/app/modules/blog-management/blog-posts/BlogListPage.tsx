@@ -58,13 +58,6 @@ function BlogListContent() {
               {intl.formatMessage({id: 'BLOG_MANAGEMENT.HEADER_SUBTITLE'})}
             </p>
           </div>
-          <button
-            className='btn btn-lg'
-            onClick={() => navigate('/blog-management/blogs/new')}
-          >
-            <i className='ki-duotone ki-plus fs-2' />
-            {intl.formatMessage({id: 'BLOG_MANAGEMENT.ADD_BLOG'})}
-          </button>
         </div>
       </div>
 

@@ -91,15 +91,6 @@ const DashboardPage: FC = () => {
                   {intl.formatMessage({id: 'DASHBOARD.DESCRIPTION'})}
                 </p>
               </div>
-
-              <div className='d-flex flex-wrap gap-3'>
-                <Link to='/user-management' className='btn btn-lg'>
-                  {intl.formatMessage({id: 'DASHBOARD.OPEN_USER_MANAGEMENT'})}
-                </Link>
-                <Link to='/blog-management/blogs' className='btn btn-lg'>
-                  {intl.formatMessage({id: 'DASHBOARD.OPEN_BLOGS'})}
-                </Link>
-              </div>
             </div>
           </div>
 

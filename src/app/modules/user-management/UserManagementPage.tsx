@@ -1,6 +1,8 @@
 import {FC, useState, useCallback} from 'react'
 import {useIntl} from 'react-intl'
 import {PageTitle} from '../../../_metronic/layout/core'
+import {Content} from '../../../_metronic/layout/components/content'
+import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
 import {EMPTY_SOCIAL_LINKS, User, UserFormValues} from './model/User'
 import {UserManagementProvider} from './UserManagementContext'
 import {useUserManagement} from './hooks/useUserManagement'
@@ -17,6 +19,7 @@ const EMPTY_FORM_VALUES: UserFormValues = {
   email: '',
   role: 'User',
   status: 'Active',
+  presenceStatus: 'Available',
   avatarFile: null,
   avatarUrl: undefined,
   socialLinks: {
@@ -31,6 +34,7 @@ const userToFormValues = (user: User): UserFormValues => ({
   email: user.email,
   role: user.role,
   status: user.status,
+  presenceStatus: user.presenceStatus,
   avatarFile: null,
   avatarUrl: user.avatarUrl,
   socialLinks: {
@@ -110,13 +114,6 @@ const UserManagementContent: FC = () => {
               {intl.formatMessage({id: 'USER_MANAGEMENT.HEADER_SUBTITLE'})}
             </p>
           </div>
-          <button type='button' className='btn btn-lg' onClick={handleAddUser}>
-            <i className='ki-duotone ki-plus fs-3 me-1'>
-              <span className='path1'></span>
-              <span className='path2'></span>
-            </i>
-            {intl.formatMessage({id: 'USER_MANAGEMENT.ADD_USER'})}
-          </button>
         </div>
       </div>
 
@@ -161,6 +158,15 @@ const UserManagementContent: FC = () => {
             <h2>{intl.formatMessage({id: 'USER_MANAGEMENT.TABLE_TITLE'})}</h2>
             <span>{intl.formatMessage({id: 'USER_MANAGEMENT.TABLE_SUBTITLE'})}</span>
           </div>
+          <div className='card-toolbar'>
+            <button type='button' className='btn btn-primary' onClick={handleAddUser}>
+              <i className='ki-duotone ki-plus fs-3 me-1'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              {intl.formatMessage({id: 'USER_MANAGEMENT.ADD_USER'})}
+            </button>
+          </div>
         </div>
         <div className='card-body py-4'>
           <UsersTable
@@ -199,7 +205,10 @@ const UserManagementPage: FC = () => {
   return (
     <UserManagementProvider>
       <PageTitle>{intl.formatMessage({id: 'USER_MANAGEMENT.TITLE'})}</PageTitle>
-      <UserManagementContent />
+      <ToolbarWrapper showActions={false} />
+      <Content>
+        <UserManagementContent />
+      </Content>
     </UserManagementProvider>
   )
 }

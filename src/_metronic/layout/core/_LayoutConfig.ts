@@ -64,7 +64,7 @@ export const DefaultConfig: ILayout = {
         minimize: {
           desktop: {
             enabled: true,
-            default: false,
+            default: true,
             hoverable: true,
           },
         },
@@ -75,7 +75,7 @@ export const DefaultConfig: ILayout = {
     },
     toolbar: {
       componentName: 'toolbar',
-      display: true,
+      display: false,
       layout: 'classic',
       class: 'py-3 py-lg-6',
       container: 'fluid',

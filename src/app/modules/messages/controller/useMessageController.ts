@@ -114,3 +114,29 @@ export function useDeleteMessage() {
     }
   )
 }
+
+export function useDeleteConversation() {
+  const queryClient = useQueryClient()
+  return useMutation(
+    ({userId, otherUserId}: {userId: string; otherUserId: string}) =>
+      messageRepository.deleteConversation(userId, otherUserId),
+    {
+      onSuccess: (_result, variables) => {
+        queryClient.invalidateQueries([MESSAGE_QUERY_KEY, 'all', variables.userId])
+        queryClient.invalidateQueries([MESSAGE_QUERY_KEY, 'all', variables.otherUserId])
+        queryClient.invalidateQueries([
+          MESSAGE_QUERY_KEY,
+          'thread',
+          variables.userId,
+          variables.otherUserId,
+        ])
+        queryClient.invalidateQueries([
+          MESSAGE_QUERY_KEY,
+          'thread',
+          variables.otherUserId,
+          variables.userId,
+        ])
+      },
+    }
+  )
+}

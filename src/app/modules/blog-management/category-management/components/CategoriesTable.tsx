@@ -18,16 +18,17 @@ export function CategoriesTable({onEdit, onDelete}: CategoriesTableProps) {
       {
         Header: intl.formatMessage({id: 'CATEGORY_MANAGEMENT.COL_NAME'}),
         accessor: 'name',
+        Cell: ({value}) => <span className='fw-bold blog-table-primary-text'>{value}</span>,
       },
       {
         Header: intl.formatMessage({id: 'CATEGORY_MANAGEMENT.COL_SLUG'}),
         accessor: 'slug',
-        Cell: ({value}) => <code className='text-muted'>{value}</code>,
+        Cell: ({value}) => <code className='blog-table-code'>{value}</code>,
       },
       {
         Header: intl.formatMessage({id: 'CATEGORY_MANAGEMENT.COL_DESCRIPTION'}),
         accessor: 'description',
-        Cell: ({value}) => <span className='text-muted'>{value ?? '-'}</span>,
+        Cell: ({value}) => <span className='blog-table-secondary-text'>{value ?? '-'}</span>,
       },
       {
         Header: intl.formatMessage({id: 'CATEGORY_MANAGEMENT.COL_SORT_ORDER'}),

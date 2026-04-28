@@ -1,6 +1,7 @@
-import {FC} from 'react'
+import {FC, useEffect, useMemo, useState} from 'react'
 import {Link, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
+import {useMutation, useQueryClient} from 'react-query'
 import {KTIcon} from '../../../_metronic/helpers'
 import {ToolbarWrapper} from '../../../_metronic/layout/components/toolbar'
 import {Content} from '../../../_metronic/layout/components/content'
@@ -8,14 +9,91 @@ import {useAuth} from '../auth'
 import {getInitials, useCurrentProfile} from '../../hooks/useCurrentProfile'
 import {useUserController} from '../user-management/controller/useUserController'
 import {RoleBadge} from '../user-management/components/RoleBadge'
+import {PresenceStatus} from '../user-management/model/User'
+import {update as updateUser} from '../user-management/repository/userRepository'
 import '../blog-management/BlogManagement.css'
+
+const PRESENCE_STATUSES: PresenceStatus[] = ['Available', 'Idle', 'Busy']
+
+const presenceClassMap: Record<PresenceStatus, string> = {
+  Available: 'success',
+  Idle: 'warning',
+  Busy: 'danger',
+}
+
+function isPresenceStatus(value: string | null): value is PresenceStatus {
+  return value === 'Available' || value === 'Idle' || value === 'Busy'
+}
+
+function isMissingPresenceColumn(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  return /presence_status|schema cache|column/i.test(error.message)
+}
 
 const ProfileHeader: FC = () => {
   const intl = useIntl()
   const location = useLocation()
+  const queryClient = useQueryClient()
   const {currentUser} = useAuth()
   const {data: profile} = useCurrentProfile(currentUser?.email)
   const {users} = useUserController()
+  const presenceStorageKey = useMemo(
+    () => (profile?.id || currentUser?.email ? `orbit-cms-presence:${profile?.id ?? currentUser?.email}` : ''),
+    [currentUser?.email, profile?.id]
+  )
+  const [presenceStatus, setPresenceStatus] = useState<PresenceStatus>('Available')
+  const [presenceError, setPresenceError] = useState<string | null>(null)
+  const presenceColor = presenceClassMap[presenceStatus]
+
+  useEffect(() => {
+    const savedPresence =
+      presenceStorageKey && isPresenceStatus(window.localStorage.getItem(presenceStorageKey))
+        ? window.localStorage.getItem(presenceStorageKey)
+        : null
+
+    setPresenceStatus(
+      isPresenceStatus(savedPresence) ? savedPresence : (profile?.presenceStatus ?? 'Available')
+    )
+  }, [presenceStorageKey, profile?.presenceStatus])
+
+  const presenceMutation = useMutation(
+    async (nextStatus: PresenceStatus) => {
+      if (!profile?.id) {
+        throw new Error('Profile is not ready yet.')
+      }
+
+      try {
+        return await updateUser(profile.id, {presenceStatus: nextStatus})
+      } catch (error) {
+        if (isMissingPresenceColumn(error)) {
+          return null
+        }
+
+        throw error
+      }
+    },
+    {
+      onMutate: (nextStatus) => {
+        setPresenceStatus(nextStatus)
+        setPresenceError(null)
+        if (presenceStorageKey) {
+          window.localStorage.setItem(presenceStorageKey, nextStatus)
+        }
+      },
+      onSuccess: (result) => {
+        if (result === null) {
+          setPresenceError('Saved in this browser. Run migration 012 to save it in Supabase.')
+          return
+        }
+
+        queryClient.invalidateQueries(['current-user-profile', currentUser?.email])
+        queryClient.invalidateQueries(['users'])
+      },
+      onError: (error) => {
+        setPresenceError(error instanceof Error ? error.message : 'Could not update status.')
+      },
+    }
+  )
 
   const fullName =
     profile?.fullName ||
@@ -44,9 +122,6 @@ const ProfileHeader: FC = () => {
                 {intl.formatMessage({id: 'PROFILE.HEADER.SUBTITLE'}, {email})}
               </p>
             </div>
-            <Link to='/user-management' className='btn btn-lg'>
-              {intl.formatMessage({id: 'PROFILE.HEADER.MANAGE_USERS'})}
-            </Link>
           </div>
         </div>
 
@@ -66,7 +141,10 @@ const ProfileHeader: FC = () => {
                       {initials}
                     </div>
                   )}
-                  <div className='position-absolute translate-middle bottom-0 start-100 mb-6 bg-success rounded-circle border border-4 border-white h-20px w-20px'></div>
+                  <div
+                    className={`position-absolute translate-middle bottom-0 start-100 mb-6 bg-${presenceColor} rounded-circle border border-4 border-white h-20px w-20px`}
+                    title={presenceStatus}
+                  ></div>
                 </div>
               </div>
 
@@ -84,8 +162,27 @@ const ProfileHeader: FC = () => {
                         {profile?.role ?? intl.formatMessage({id: 'PROFILE.HEADER.TEAM_MEMBER'})}
                       </span>
                       <span className='d-flex align-items-center text-gray-600 me-5 mb-2'>
-                        <KTIcon iconName='check-circle' className='fs-4 me-1' />
-                        {profile?.status ?? intl.formatMessage({id: 'PROFILE.HEADER.STATUS_UNAVAILABLE'})}
+                        <span className={`badge badge-light-${presenceColor} me-2`}>
+                          {presenceStatus}
+                        </span>
+                        <select
+                          className='form-select form-select-sm form-select-solid profile-presence-select'
+                          value={presenceStatus}
+                          disabled={!profile?.id || presenceMutation.isLoading}
+                          onChange={(event) =>
+                            presenceMutation.mutate(event.target.value as PresenceStatus)
+                          }
+                          aria-label='Change profile presence status'
+                        >
+                          {PRESENCE_STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                        {presenceError && (
+                          <span className='text-danger fs-8 ms-2'>{presenceError}</span>
+                        )}
                       </span>
                       <span className='d-flex align-items-center text-gray-600 mb-2'>
                         <KTIcon iconName='sms' className='fs-4 me-1' />

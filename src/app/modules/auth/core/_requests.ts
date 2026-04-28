@@ -124,6 +124,7 @@ async function ensureUserProfile(user: User): Promise<void> {
     email,
     role: 'User',
     status: 'Active',
+    presence_status: 'Available',
   })
 
   if (insertError) {

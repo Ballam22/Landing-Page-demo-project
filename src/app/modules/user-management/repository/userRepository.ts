@@ -1,5 +1,5 @@
 import {supabase} from '../../../lib/supabaseClient'
-import {EMPTY_SOCIAL_LINKS, Role, SocialLinks, Status, User} from '../model/User'
+import {EMPTY_SOCIAL_LINKS, PresenceStatus, Role, SocialLinks, Status, User} from '../model/User'
 
 const BUCKET = 'avatars'
 
@@ -9,6 +9,7 @@ type DbRow = {
   email: string
   role: Role
   status: Status
+  presence_status?: PresenceStatus | null
   avatar_url: string | null
   linkedin_username: string | null
   linkedin_url: string | null
@@ -43,6 +44,7 @@ function rowToUser(row: DbRow): User {
     email: row.email,
     role: row.role,
     status: row.status,
+    presenceStatus: row.presence_status ?? 'Available',
     avatarUrl: row.avatar_url ?? undefined,
     socialLinks: rowToSocialLinks(row),
   }
@@ -87,6 +89,7 @@ export async function create(user: User): Promise<User> {
       email: user.email,
       role: user.role,
       status: user.status,
+      presence_status: user.presenceStatus,
       avatar_url: user.avatarUrl ?? null,
       linkedin_username: user.socialLinks.linkedin.username || null,
       linkedin_url: user.socialLinks.linkedin.url || null,
@@ -111,6 +114,7 @@ export async function update(
   if (payload.email !== undefined) patch.email = payload.email
   if (payload.role !== undefined) patch.role = payload.role
   if (payload.status !== undefined) patch.status = payload.status
+  if (payload.presenceStatus !== undefined) patch.presence_status = payload.presenceStatus
   if (payload.avatarUrl !== undefined) patch.avatar_url = payload.avatarUrl
   if (payload.socialLinks !== undefined) {
     patch.linkedin_username = payload.socialLinks.linkedin.username || null

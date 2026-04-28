@@ -203,6 +203,7 @@ const UserModalForm: FC<Props> = ({mode, userId, initialValues, existingEmails, 
               email: values.email,
               role: values.role,
               status: values.status,
+              presenceStatus: values.presenceStatus,
               avatarUrl: values.avatarUrl,
               socialLinks: {
                 linkedin: {
@@ -229,6 +230,7 @@ const UserModalForm: FC<Props> = ({mode, userId, initialValues, existingEmails, 
               email: values.email,
               role: values.role,
               status: values.status,
+              presenceStatus: values.presenceStatus,
               avatarUrl: values.avatarUrl,
               socialLinks: {
                 linkedin: {
