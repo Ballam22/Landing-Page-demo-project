@@ -68,7 +68,7 @@ export default function EnrollmentPage() {
         <div className='card course-management-card'>
           <div className='card-header border-0 pt-6'>
             <div className='card-title course-management-card-title'>
-              <h2>{intl.formatMessage({id: 'COURSE_MANAGEMENT.ENROLLMENTS.TITLE'})}</h2>
+              <h2>Enrolled Users</h2>
               <span>Review learner-course assignments and update access as needed.</span>
             </div>
             <div className='card-toolbar'>
