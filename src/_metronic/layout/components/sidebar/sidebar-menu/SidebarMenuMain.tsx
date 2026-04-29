@@ -13,6 +13,11 @@ const SidebarMenuMain = () => {
         title='Blogs'
       />
       <SidebarMenuItem
+        to='/course-management'
+        icon='book'
+        title={intl.formatMessage({id: 'COURSE_MANAGEMENT.TITLE'})}
+      />
+      <SidebarMenuItem
         to='/dashboard'
         icon='element-11'
         title={intl.formatMessage({id: 'MENU.DASHBOARD'})}

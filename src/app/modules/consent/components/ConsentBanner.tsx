@@ -44,7 +44,7 @@ export const ConsentBanner: FC<ConsentBannerProps> = ({
     setIsLoading(true)
     try {
       // Record consent in Supabase (GDPR Article 4(11))
-      await recordConsent(currentUser.id, consentType, true)
+      await recordConsent(String(currentUser.id), consentType, true)
 
       // Mark banner as seen
       markConsentBannerAsSeen(consentType)

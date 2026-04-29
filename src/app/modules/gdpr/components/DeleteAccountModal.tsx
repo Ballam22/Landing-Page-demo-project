@@ -25,6 +25,8 @@ export const DeleteAccountModal: FC<DeleteAccountModalProps> = ({ isOpen, onClos
 
   if (!isOpen || !currentUser) return null
 
+  const currentUserId = String(currentUser.id)
+
   const handleInitialConfirm = () => {
     setStep('reason')
   }
@@ -38,7 +40,7 @@ export const DeleteAccountModal: FC<DeleteAccountModalProps> = ({ isOpen, onClos
     setError('')
 
     try {
-      const data = await exportUserData(currentUser.id)
+      const data = await exportUserData(currentUserId)
       setExportData(data)
 
       // Create download link
@@ -70,7 +72,7 @@ export const DeleteAccountModal: FC<DeleteAccountModalProps> = ({ isOpen, onClos
     setStep('processing')
 
     try {
-      const result = await deleteUserAccount(currentUser.id, reason)
+      const result = await deleteUserAccount(currentUserId, reason)
 
       if (result.success) {
         setStep('done')
