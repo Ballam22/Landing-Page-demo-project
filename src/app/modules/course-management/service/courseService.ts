@@ -1,4 +1,6 @@
 import type {Course, CourseFormValues} from '../model/Course'
+import type {Section} from '../model/Section'
+import type {Lesson} from '../model/Lesson'
 import {
   getCourses,
   getCourseById,
@@ -8,7 +10,10 @@ import {
   slugExists,
   uploadThumbnail,
   countEnrollmentsByCourse,
+  getCourseWithSections,
+  getFeaturedCoursesByCategory,
 } from '../repository/courseRepository'
+import {supabase} from '../../../lib/supabaseClient'
 
 export function toSlug(value: string): string {
   return value
@@ -64,8 +69,40 @@ export async function editCourse(id: string, values: CourseFormValues): Promise<
     categoryId: values.categoryId,
     status: values.status,
     sortOrder: values.sortOrder,
+    price: values.price,
     ...(thumbnailPath !== undefined ? {thumbnailPath} : {}),
   })
+}
+
+export async function fetchCourseWithSections(
+  courseId: string
+): Promise<Course & {sections: (Section & {lessons: Lesson[]})[]}> {
+  return getCourseWithSections(courseId)
+}
+
+export async function fetchFeaturedCoursesByCategory(): Promise<
+  {category: {id: string; name: string}; course: Course | null}[]
+> {
+  return getFeaturedCoursesByCategory()
+}
+
+export async function fetchAverageRatingsByCourse(): Promise<
+  {courseId: string; avgRating: number; reviewCount: number}[]
+> {
+  const {data, error} = await supabase.from('reviews').select('course_id, rating')
+  if (error) throw new Error(error.message)
+
+  const map = new Map<string, {sum: number; count: number}>()
+  for (const row of data as {course_id: string; rating: number}[]) {
+    const existing = map.get(row.course_id) ?? {sum: 0, count: 0}
+    map.set(row.course_id, {sum: existing.sum + row.rating, count: existing.count + 1})
+  }
+
+  return Array.from(map.entries()).map(([courseId, {sum, count}]) => ({
+    courseId,
+    avgRating: Math.round((sum / count) * 10) / 10,
+    reviewCount: count,
+  }))
 }
 
 export async function removeCourse(id: string): Promise<void> {

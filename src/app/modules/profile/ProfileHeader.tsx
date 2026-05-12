@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useState} from 'react'
+﻿import {FC, useEffect, useMemo, useState} from 'react'
 import {Link, useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 import {useMutation, useQueryClient} from 'react-query'
@@ -38,7 +38,7 @@ const ProfileHeader: FC = () => {
   const {data: profile} = useCurrentProfile(currentUser?.email)
   const {users} = useUserController()
   const presenceStorageKey = useMemo(
-    () => (profile?.id || currentUser?.email ? `orbit-cms-presence:${profile?.id ?? currentUser?.email}` : ''),
+    () => (profile?.id || currentUser?.email ? `learnhub-presence:${profile?.id ?? currentUser?.email}` : ''),
     [currentUser?.email, profile?.id]
   )
   const [presenceStatus, setPresenceStatus] = useState<PresenceStatus>('Available')

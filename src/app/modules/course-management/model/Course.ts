@@ -10,9 +10,12 @@ export type Course = {
   thumbnailUrl: string | undefined
   status: CourseStatus
   sortOrder: number
+  price: number
   createdAt: string
   updatedAt: string
   category?: {id: string; name: string}
+  avgRating?: number
+  reviewCount?: number
 }
 
 export type CourseFormValues = {
@@ -23,6 +26,7 @@ export type CourseFormValues = {
   thumbnailFile: File | null
   status: CourseStatus
   sortOrder: number
+  price: number
 }
 
 export const COURSE_FORM_DEFAULTS: CourseFormValues = {
@@ -33,4 +37,5 @@ export const COURSE_FORM_DEFAULTS: CourseFormValues = {
   thumbnailFile: null,
   status: 'Draft',
   sortOrder: 0,
+  price: 0,
 }

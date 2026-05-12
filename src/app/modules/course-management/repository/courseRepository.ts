@@ -1,5 +1,7 @@
 import {supabase} from '../../../lib/supabaseClient'
 import type {Course, CourseFormValues} from '../model/Course'
+import type {Section} from '../model/Section'
+import type {Lesson} from '../model/Lesson'
 
 type CourseDbRow = {
   id: string
@@ -10,6 +12,7 @@ type CourseDbRow = {
   thumbnail_path: string | null
   status: string
   sort_order: number
+  price: number | null
   created_at: string
   updated_at: string
   categories: {id: string; name: string} | null
@@ -26,6 +29,7 @@ function rowToCourse(row: CourseDbRow): Course {
     thumbnailUrl: row.thumbnail_path ? getPublicThumbnailUrl(row.thumbnail_path) : undefined,
     status: row.status as Course['status'],
     sortOrder: row.sort_order,
+    price: row.price ?? 0,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     category: row.categories ?? undefined,
@@ -64,6 +68,7 @@ export async function createCourse(
       thumbnail_path: values.thumbnailPath ?? null,
       status: values.status,
       sort_order: values.sortOrder,
+      price: values.price ?? 0,
     })
     .select('*, categories(id, name)')
     .single()
@@ -83,6 +88,7 @@ export async function updateCourse(
   if (values.thumbnailPath !== undefined) payload.thumbnail_path = values.thumbnailPath
   if (values.status !== undefined) payload.status = values.status
   if (values.sortOrder !== undefined) payload.sort_order = values.sortOrder
+  if (values.price !== undefined) payload.price = values.price
 
   const {data, error} = await supabase
     .from('courses')
@@ -127,4 +133,100 @@ export async function countEnrollmentsByCourse(courseId: string): Promise<number
     .eq('course_id', courseId)
   if (error) throw new Error(error.message)
   return count ?? 0
+}
+
+type SectionWithLessonsDbRow = {
+  id: string
+  course_id: string
+  title: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+  lessons: {
+    id: string
+    section_id: string
+    title: string
+    description: string | null
+    video_path: string | null
+    duration: number | null
+    sort_order: number
+    is_free: boolean
+    created_at: string
+    updated_at: string
+  }[]
+}
+
+export async function getCourseWithSections(
+  courseId: string
+): Promise<Course & {sections: (Section & {lessons: Lesson[]})[]}> {
+  const {data: courseData, error: courseError} = await supabase
+    .from('courses')
+    .select('*, categories(id, name)')
+    .eq('id', courseId)
+    .single()
+  if (courseError) throw new Error(courseError.message)
+  const course = rowToCourse(courseData as CourseDbRow)
+
+  const {data: sectionsData, error: sectionsError} = await supabase
+    .from('sections')
+    .select('*, lessons(*)')
+    .eq('course_id', courseId)
+    .order('sort_order', {ascending: true})
+  if (sectionsError) throw new Error(sectionsError.message)
+
+  const sections = (sectionsData as SectionWithLessonsDbRow[]).map((s) => ({
+    id: s.id,
+    courseId: s.course_id,
+    title: s.title,
+    sortOrder: s.sort_order,
+    createdAt: s.created_at,
+    updatedAt: s.updated_at,
+    lessons: (s.lessons ?? [])
+      .slice()
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((l) => ({
+        id: l.id,
+        sectionId: l.section_id,
+        title: l.title,
+        description: l.description ?? undefined,
+        videoPath: l.video_path ?? undefined,
+        videoSignedUrl: undefined,
+        duration: l.duration ?? undefined,
+        sortOrder: l.sort_order,
+        isFree: l.is_free,
+        createdAt: l.created_at,
+        updatedAt: l.updated_at,
+      })),
+  }))
+
+  return {...course, sections}
+}
+
+export async function getFeaturedCoursesByCategory(): Promise<
+  {category: {id: string; name: string}; course: Course | null}[]
+> {
+  const {data: categories, error: catError} = await supabase
+    .from('categories')
+    .select('id, name')
+    .order('name', {ascending: true})
+  if (catError) throw new Error(catError.message)
+
+  const results: {category: {id: string; name: string}; course: Course | null}[] = []
+
+  for (const cat of categories as {id: string; name: string}[]) {
+    const {data, error} = await supabase
+      .from('courses')
+      .select('*, categories(id, name)')
+      .eq('category_id', cat.id)
+      .eq('status', 'Published')
+      .order('sort_order', {ascending: true})
+      .limit(1)
+    if (error) throw new Error(error.message)
+    results.push({
+      category: cat,
+      course: data && data.length > 0 ? rowToCourse(data[0] as CourseDbRow) : null,
+    })
+  }
+
+  return results
 }

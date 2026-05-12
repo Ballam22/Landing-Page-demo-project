@@ -11,6 +11,8 @@ import {useUserDetailDrawer} from '../../modules/user-management/controller/useU
 import {UserDetailDrawer} from '../../modules/user-management/components/UserDetailDrawer'
 import {Blog} from '../../modules/blog-management/blog-posts/model/Blog'
 import {getAllBlogs} from '../../modules/blog-management/blog-posts/repository/blogRepository'
+import {fetchFeaturedCoursesByCategory, fetchAverageRatingsByCourse} from '../../modules/course-management/service/courseService'
+import {FeaturedCategoryCard} from '../../modules/course-management/course-detail/components/FeaturedCategoryCard'
 import '../../modules/blog-management/BlogManagement.css'
 
 function sanitizePreviewHtml(value: string): string {
@@ -51,6 +53,16 @@ const DashboardPage: FC = () => {
   const {currentUser} = useAuth()
   const {users, isLoading, error} = useUserController()
   const {data: blogs = [], isLoading: blogsLoading} = useQuery(['blogs'], getAllBlogs, {staleTime: 0})
+  const {data: featuredCourses = [], isLoading: featuredLoading} = useQuery(
+    ['featured-courses-by-category'],
+    fetchFeaturedCoursesByCategory,
+    {staleTime: 0}
+  )
+  const {data: courseRatings = []} = useQuery(
+    ['course-avg-ratings'],
+    fetchAverageRatingsByCourse,
+    {staleTime: 0}
+  )
   const {selectedDetailUser, isOpen, openDrawer, closeDrawer} = useUserDetailDrawer()
   const [previewBlog, setPreviewBlog] = useState<Blog | null>(null)
 
@@ -271,6 +283,37 @@ const DashboardPage: FC = () => {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className='card blog-management-card mb-5'>
+            <div className='card-header border-0 pt-5'>
+              <h3 className='card-title fw-bolder'>
+                {intl.formatMessage({id: 'COURSE_DETAIL.FEATURED_COURSES_TITLE'})}
+              </h3>
+            </div>
+            <div className='card-body pt-0'>
+              {featuredLoading ? (
+                <div className='d-flex justify-content-center py-8'>
+                  <span className='spinner-border text-primary' />
+                </div>
+              ) : (
+                <div className='row g-5'>
+                  {featuredCourses.map(({category, course}) => {
+                    const ratingEntry = course
+                      ? courseRatings.find((r) => r.courseId === course.id)
+                      : undefined
+                    const enrichedCourse = course && ratingEntry
+                      ? {...course, avgRating: ratingEntry.avgRating, reviewCount: ratingEntry.reviewCount}
+                      : course
+                    return (
+                      <div key={category.id} className='col-xl-3 col-md-4 col-sm-6'>
+                        <FeaturedCategoryCard category={category} course={enrichedCourse} />
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

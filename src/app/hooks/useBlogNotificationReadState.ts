@@ -1,8 +1,8 @@
-import {useCallback, useEffect, useState} from 'react'
+﻿import {useCallback, useEffect, useState} from 'react'
 import {Blog} from '../modules/blog-management/blog-posts/model/Blog'
 
-const STORAGE_KEY = 'orbit-cms-blog-notifications-viewed-at'
-const STORAGE_EVENT = 'orbit-cms-blog-notifications-viewed'
+const STORAGE_KEY = 'learnhub-blog-notifications-viewed-at'
+const STORAGE_EVENT = 'learnhub-blog-notifications-viewed'
 
 function readViewedAt(): number {
   const value = window.localStorage.getItem(STORAGE_KEY)

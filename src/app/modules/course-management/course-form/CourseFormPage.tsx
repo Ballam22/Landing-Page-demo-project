@@ -16,6 +16,7 @@ const validationSchema = Yup.object({
     .required('Slug is required')
     .matches(/^[a-z0-9-]+$/, 'Slug may only contain lowercase letters, numbers and hyphens'),
   sortOrder: Yup.number().min(0).required(),
+  price: Yup.number().min(0, 'Price must be 0 or greater').required('Price is required'),
 })
 
 function CourseFormContent() {
@@ -44,6 +45,7 @@ function CourseFormContent() {
         thumbnailFile: null,
         status: course.status,
         sortOrder: course.sortOrder,
+        price: course.price,
       }
     : COURSE_FORM_DEFAULTS
 

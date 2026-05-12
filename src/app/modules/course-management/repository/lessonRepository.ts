@@ -1,6 +1,22 @@
 import {supabase} from '../../../lib/supabaseClient'
 import type {Lesson, LessonFormValues} from '../model/Lesson'
 
+type LessonProgressDbRow = {
+  id: string
+  user_id: string
+  lesson_id: string
+  completed: boolean
+  completed_at: string | null
+}
+
+export type LessonProgress = {
+  id: string
+  userId: string
+  lessonId: string
+  completed: boolean
+  completedAt: string | undefined
+}
+
 type LessonDbRow = {
   id: string
   section_id: string
@@ -116,4 +132,24 @@ export async function getSignedVideoUrl(path: string): Promise<string> {
     .createSignedUrl(path, 3600)
   if (error) throw new Error(error.message)
   return data.signedUrl
+}
+
+export async function getLessonProgressByUserAndLessons(
+  userId: string,
+  lessonIds: string[]
+): Promise<LessonProgress[]> {
+  if (lessonIds.length === 0) return []
+  const {data, error} = await supabase
+    .from('lesson_progress')
+    .select('*')
+    .eq('user_id', userId)
+    .in('lesson_id', lessonIds)
+  if (error) throw new Error(error.message)
+  return (data as LessonProgressDbRow[]).map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    lessonId: row.lesson_id,
+    completed: row.completed,
+    completedAt: row.completed_at ?? undefined,
+  }))
 }

@@ -1,6 +1,6 @@
 ﻿# metronic_react_v8.2.3_demo1 Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-28
+Auto-generated from all feature plans. Last updated: 2026-05-12
 
 ## Active Technologies
 - localStorage (mock user store, lockout, rate limit); in-memory Map (reset tokens) (001-user-auth)
@@ -20,6 +20,10 @@ Auto-generated from all feature plans. Last updated: 2026-04-28
 - Database: Supabase (PostgreSQL) via `src/app/lib/supabaseClient.ts` | Files: Supabase Storage `blog-images` bucket (public) (007-blog-management)
 - TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0, React Table ^7.7.0, React Intl ^6.4.4, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS (008-course-management)
 - Database: Supabase (PostgreSQL) via `src/app/lib/supabaseClient.ts` | Files: Supabase Storage — `course-thumbnails` (public), `course-videos` (private, signed URLs) (008-course-management)
+- TypeScript ^5.3.3 + React ^18.2.0 + React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Keenicons (star icon for ratings) (009-courses-udemy-style)
+- Supabase (PostgreSQL) via `src/app/lib/supabaseClient.ts` | Files: Supabase Storage `course-thumbnails` (public) for thumbnail display — no new uploads in this feature (009-courses-udemy-style)
+- TypeScript ^5.3.3 + React ^18.2.0 + React Query 3.38.0, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Keenicons (star ratings) (010-public-landing-page)
+- Supabase (PostgreSQL) via `src/app/lib/supabaseClient.ts` | Files: Supabase Storage `course-thumbnails` (public) and `blog-images` (public) — read only, no uploads (010-public-landing-page)
 
 - TypeScript 5.3.3 + React 18.2, React Router DOM 6.30, Formik 2.2.9, Yup 1.0, Axios 1.13.5, React Intl 6.4.4 (001-user-auth)
 
@@ -40,9 +44,9 @@ npm test; npm run lint
 TypeScript 5.3.3: Follow standard conventions
 
 ## Recent Changes
+- 010-public-landing-page: Added TypeScript ^5.3.3 + React ^18.2.0 + React Query 3.38.0, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Keenicons (star ratings)
+- 009-courses-udemy-style: Added TypeScript ^5.3.3 + React ^18.2.0 + React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Keenicons (star icon for ratings)
 - 008-course-management: Added TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0, React Table ^7.7.0, React Intl ^6.4.4, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS
-- 007-blog-management: Added TypeScript ^5.3.3 + React ^18.2.0 + React Query 3.38.0, Formik 2.2.9, Yup ^1.0.0, React Table ^7.7.0, React Intl ^6.4.4, React Router DOM 6.30.3, Bootstrap 5 + Metronic SCSS
-- 006-direct-messages: Added TypeScript ^5.3.3 + React ^18.2.0, React Query 3.38.0, Bootstrap 5 + Metronic SCSS, React Intl ^6.4.4, Supabase JS ^2.104.0
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -106,6 +106,20 @@ export function CourseFormFields({currentThumbnailUrl}: CourseFormFieldsProps) {
         <ErrorMessage name='sortOrder' component='div' className='text-danger mt-1 fs-7' />
       </div>
 
+      <div className='mb-7'>
+        <label className='form-label fw-bold'>
+          {intl.formatMessage({id: 'COURSE_MANAGEMENT.COURSES.FIELD_PRICE'})}
+        </label>
+        <Field
+          name='price'
+          type='number'
+          min={0}
+          step={0.01}
+          className='form-control form-control-solid'
+        />
+        <ErrorMessage name='price' component='div' className='text-danger mt-1 fs-7' />
+      </div>
+
       <ThumbnailUpload currentUrl={currentThumbnailUrl} />
     </>
   )

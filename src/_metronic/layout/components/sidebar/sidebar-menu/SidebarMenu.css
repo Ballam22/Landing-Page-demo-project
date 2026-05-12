@@ -1,4 +1,4 @@
-#kt_app_sidebar {
+﻿#kt_app_sidebar {
   background:
     linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(20, 83, 45, 0.92)),
     linear-gradient(90deg, rgba(34, 197, 94, 0.18), rgba(245, 158, 11, 0.12), rgba(56, 189, 248, 0.14));
@@ -8,21 +8,21 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-#kt_app_sidebar .orbit-cms-logo {
+#kt_app_sidebar .learnhub-logo {
   display: inline-flex;
   align-items: center;
   min-width: 0;
   text-decoration: none;
 }
 
-#kt_app_sidebar .orbit-cms-logo-default {
+#kt_app_sidebar .learnhub-logo-default {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
   min-width: 0;
 }
 
-#kt_app_sidebar .orbit-cms-mark {
+#kt_app_sidebar .learnhub-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -37,35 +37,35 @@
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
 }
 
-#kt_app_sidebar .orbit-cms-mark svg {
+#kt_app_sidebar .learnhub-mark svg {
   width: 23px;
   height: 23px;
   overflow: visible;
 }
 
-#kt_app_sidebar .orbit-cms-core {
+#kt_app_sidebar .learnhub-core {
   fill: #6ee7b7;
 }
 
-#kt_app_sidebar .orbit-cms-ring {
+#kt_app_sidebar .learnhub-ring {
   fill: none;
   stroke-linecap: round;
   stroke-width: 2;
 }
 
-#kt_app_sidebar .orbit-cms-ring-main {
+#kt_app_sidebar .learnhub-ring-main {
   stroke: rgba(248, 250, 252, 0.78);
 }
 
-#kt_app_sidebar .orbit-cms-ring-alt {
+#kt_app_sidebar .learnhub-ring-alt {
   stroke: rgba(56, 189, 248, 0.78);
 }
 
-#kt_app_sidebar .orbit-cms-satellite {
+#kt_app_sidebar .learnhub-satellite {
   fill: #f59e0b;
 }
 
-#kt_app_sidebar .orbit-cms-wordmark {
+#kt_app_sidebar .learnhub-wordmark {
   color: #f8fafc;
   font-size: 1.1rem;
   font-weight: 800;
@@ -139,17 +139,17 @@
   padding: 0 0.55rem;
 }
 
-[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .orbit-cms-logo-default {
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .learnhub-logo-default {
   display: inline-flex !important;
 }
 
-[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .orbit-cms-wordmark {
+[data-kt-app-sidebar-minimize='on'] #kt_app_sidebar .learnhub-wordmark {
   display: none;
 }
 
 [data-kt-app-sidebar-hoverable='true'][data-kt-app-sidebar-minimize='on']
   #kt_app_sidebar:hover:not(.animating)
-  .orbit-cms-wordmark {
+  .learnhub-wordmark {
   display: inline;
 }
 

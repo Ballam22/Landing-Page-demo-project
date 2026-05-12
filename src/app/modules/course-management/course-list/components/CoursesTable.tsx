@@ -2,8 +2,10 @@ import {useMemo} from 'react'
 import {Column, useTable} from 'react-table'
 import {useIntl} from 'react-intl'
 import {useNavigate} from 'react-router-dom'
+import {useQuery} from 'react-query'
 import type {Course} from '../../model/Course'
 import {useCourseController} from '../../controller/useCourseController'
+import {fetchAverageRatingsByCourse} from '../../service/courseService'
 
 type CoursesTableProps = {
   onDelete: (course: Course) => void
@@ -28,6 +30,19 @@ export function CoursesTable({onDelete}: CoursesTableProps) {
   const intl = useIntl()
   const navigate = useNavigate()
   const {courses, isLoading, error} = useCourseController()
+  const {data: courseRatings = []} = useQuery(
+    ['course-avg-ratings'],
+    fetchAverageRatingsByCourse,
+    {staleTime: 0}
+  )
+
+  const ratingMap = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const r of courseRatings) {
+      map.set(r.courseId, r.avgRating)
+    }
+    return map
+  }, [courseRatings])
 
   const columns = useMemo<Column<Course>[]>(
     () => [
@@ -77,6 +92,18 @@ export function CoursesTable({onDelete}: CoursesTableProps) {
         Cell: ({value}) => <span className='badge badge-light'>{value}</span>,
       },
       {
+        Header: intl.formatMessage({id: 'COURSE_DETAIL.AVG_RATING_COLUMN'}),
+        id: 'avgRating',
+        Cell: ({row}: {row: {original: Course}}) => {
+          const avg = ratingMap.get(row.original.id)
+          return avg !== undefined ? (
+            <span className='fw-semibold'>{avg.toFixed(1)} ★</span>
+          ) : (
+            <span className='text-muted'>—</span>
+          )
+        },
+      },
+      {
         Header: 'Created',
         accessor: 'createdAt',
         Cell: ({value}) => (
@@ -115,7 +142,7 @@ export function CoursesTable({onDelete}: CoursesTableProps) {
         ),
       },
     ],
-    [intl, navigate, onDelete]
+    [intl, navigate, onDelete, ratingMap]
   )
 
   const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} = useTable({
