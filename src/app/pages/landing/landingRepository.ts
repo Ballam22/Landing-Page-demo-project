@@ -2,6 +2,13 @@ import {supabase} from '../../lib/supabaseClient'
 import {getPublicThumbnailUrl} from '../../modules/course-management/repository/courseRepository'
 import type {PublicCourse, PublicCategory, PublicReview, PublicBlogPost, LandingStats} from './model'
 
+function firstRelation<T>(value: T | T[] | null | undefined): T | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null
+  }
+  return value ?? null
+}
+
 export async function getPublicCourses(): Promise<PublicCourse[]> {
   const [{data: coursesData, error: coursesError}, {data: reviewsData, error: reviewsError}] =
     await Promise.all([
@@ -30,16 +37,17 @@ export async function getPublicCourses(): Promise<PublicCourse[]> {
       thumbnail_path: string | null
       category_id: string | null
       price: number | null
-      categories: {id: string; name: string} | null
+      categories: {id: string; name: string} | {id: string; name: string}[] | null
     }[]
   ).map((row) => {
     const ratingEntry = ratingMap.get(row.id)
+    const category = firstRelation(row.categories)
     return {
       id: row.id,
       title: row.title,
       thumbnailUrl: row.thumbnail_path ? getPublicThumbnailUrl(row.thumbnail_path) : undefined,
       categoryId: row.category_id ?? undefined,
-      categoryName: row.categories?.name ?? undefined,
+      categoryName: category?.name ?? undefined,
       price: row.price ?? 0,
       avgRating: ratingEntry ? Math.round((ratingEntry.sum / ratingEntry.count) * 10) / 10 : 0,
     }
@@ -118,20 +126,27 @@ export async function getTopReviews(): Promise<PublicReview[]> {
       rating: number
       comment: string | null
       created_at: string
-      users: {full_name: string; avatar_url: string | null} | null
-      courses: {title: string} | null
+      users:
+        | {full_name: string; avatar_url: string | null}
+        | {full_name: string; avatar_url: string | null}[]
+        | null
+      courses: {title: string} | {title: string}[] | null
     }[]
-  ).map((row) => ({
-    id: row.id,
-    courseId: row.course_id,
-    courseTitle: row.courses?.title ?? '',
-    rating: row.rating,
-    comment: row.comment ?? undefined,
-    createdAt: row.created_at,
-    user: row.users
-      ? {fullName: row.users.full_name, avatarUrl: row.users.avatar_url ?? undefined}
-      : undefined,
-  }))
+  ).map((row) => {
+    const course = firstRelation(row.courses)
+    const user = firstRelation(row.users)
+    return {
+      id: row.id,
+      courseId: row.course_id,
+      courseTitle: course?.title ?? '',
+      rating: row.rating,
+      comment: row.comment ?? undefined,
+      createdAt: row.created_at,
+      user: user
+        ? {fullName: user.full_name, avatarUrl: user.avatar_url ?? undefined}
+        : undefined,
+    }
+  })
 }
 
 export async function getLatestBlogPosts(): Promise<PublicBlogPost[]> {
@@ -150,14 +165,17 @@ export async function getLatestBlogPosts(): Promise<PublicBlogPost[]> {
       excerpt: string | null
       featured_image_url: string | null
       created_at: string
-      categories: {name: string} | null
+      categories: {name: string} | {name: string}[] | null
     }[]
-  ).map((row) => ({
-    id: row.id,
-    title: row.title,
-    excerpt: row.excerpt ?? undefined,
-    featuredImageUrl: row.featured_image_url ?? undefined,
-    categoryName: row.categories?.name ?? undefined,
-    createdAt: row.created_at,
-  }))
+  ).map((row) => {
+    const category = firstRelation(row.categories)
+    return {
+      id: row.id,
+      title: row.title,
+      excerpt: row.excerpt ?? undefined,
+      featuredImageUrl: row.featured_image_url ?? undefined,
+      categoryName: category?.name ?? undefined,
+      createdAt: row.created_at,
+    }
+  })
 }
